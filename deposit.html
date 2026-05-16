@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit - EarnPro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;">
+        <div class="card" style="width: 100%; max-width: 400px; text-align: center; border: 1px solid #38bdf8;">
+            <i class="fa-solid fa-wallet" style="font-size: 50px; color: #38bdf8; margin-bottom: 20px;"></i>
+            <h2 style="margin-bottom: 10px;">Deposit Money</h2>
+            <p style="font-size: 13px; color: #94a3b8; margin-bottom: 25px;">Upgrade your plan to earn more daily</p>
+
+            <div style="background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #eab308; padding: 15px; border-radius: 12px; text-align: left; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="color: #eab308; font-weight: bold; font-size: 14px;"><i class="fa-solid fa-money-bill-wave"></i> JazzCash Account</span>
+                    <span style="background: #eab308; color: #000; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold;">Active</span>
+                </div>
+                <p style="font-size: 11px; color: #94a3b8; margin: 0;">ACCOUNT NAME</p>
+                <h4 style="margin: 2px 0 10px 0; color: #fff; font-size: 16px;">Muhammad Amir</h4>
+                
+                <p style="font-size: 11px; color: #94a3b8; margin: 0;">ACCOUNT NUMBER</p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h4 id="acNo" style="margin: 2px 0 0 0; color: #deff9a; font-size: 18px; letter-spacing: 1px;">03266956534</h4>
+                    <i class="fa-solid fa-copy" style="color: #38bdf8; cursor: pointer;" onclick="copyNumber()"></i>
+                </div>
+            </div>
+
+            <div style="text-align: left;">
+                <label style="font-size: 12px; color: #38bdf8; margin-left: 5px;">Select Amount (PKR)</label>
+                <select id="dAmount" style="width: 100%; padding: 12px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 8px; margin-bottom: 15px;">
+                    <option value="1500">Rs. 1,500 (VIP 1)</option>
+                    <option value="3000">Rs. 3,000 (VIP 2)</option>
+                    <option value="5000">Rs. 5,000 (VIP 3)</option>
+                    <option value="10000">Rs. 10,000 (VIP 4)</option>
+                    <option value="25000">Rs. 25,000 (VIP 5)</option>
+                    <option value="50000">Rs. 50,000 (VIP 6)</option>
+                    <option value="75000">Rs. 75,000 (VIP 7)</option>
+                    <option value="100000">Rs. 100,000 (VIP 8)</option>
+                    <option value="150000">Rs. 150000 (VIP 9)</option>
+                    <option value="200000">Rs. 200000 (VIP 10)</option>
+                    <option value="225000">Rs. 225000 (VIP 11)</option>
+                    <option value="250000">Rs. 250000 (VIP 12)</option>
+                </select>
+
+                <label style="font-size: 12px; color: #38bdf8; margin-left: 5px;">Transaction ID (TID)</label>
+                <input type="text" id="dTid" placeholder="Enter 11-digit JazzCash TID" style="margin-bottom: 5px;">
+                <p style="font-size: 10px; color: #94a3b8; margin: 0 0 20px 5px;">Paise bhejney ke baad JazzCash ki T_ID yahan likhein.</p>
+            </div>
+
+            <button id="depositBtn" style="background: #38bdf8; color: #0f172a; font-weight: bold; width: 100%;">
+                Submit Deposit Request
+            </button>
+
+            <p style="margin-top: 20px; font-size: 14px; color: #94a3b8;">
+                <a href="index.html" style="color: #64748b; text-decoration: none;"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Non-Firebase helper function for Copy Button
+        function copyNumber() {
+            const num = document.getElementById("acNo").innerText;
+            navigator.clipboard.writeText(num);
+            alert("JazzCash Number Copied: " + num);
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAsUq4BEYktF7gTHMB3zaJNX-ugdPVTfoo",
+            authDomain: "earnpro-14953.firebaseapp.com",
+            databaseURL: "https://earnpro-14953-default-rtdb.firebaseio.com",
+            projectId: "earnpro-14953",
+            storageBucket: "earnpro-14953.firebasestorage.app",
+            messagingSenderId: "754662452601",
+            appId: "1:754662452601:web:0548a7ee79ffafc63f13a8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Check user session
+        const phone = localStorage.getItem("currentUser");
+        if(!phone) { window.location.href = 'login.html'; }
+
+        // Event listener for Submit Button
+        document.getElementById("depositBtn").addEventListener("click", () => {
+            const amount = document.getElementById("dAmount").value;
+            const tid = document.getElementById("dTid").value.trim();
+            const btn = document.getElementById("depositBtn");
+
+            if(!tid) {
+                alert("Jani, Transaction ID (TID) likhna zaroori hai!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = "Sending Request...";
+
+            // Push to 'deposits' node in Firebase Realtime Database
+            const depositsRef = ref(db, 'deposits');
+            const newDepositRef = push(depositsRef);
+
+            set(newDepositRef, {
+                user: phone,
+                amount: amount,
+                tid: tid,
+                status: "Pending",
+                date: new Date().toLocaleString()
+            }).then(() => {
+                alert("Deposit request successfully submitted to Muhammad Amir!\nStatus: Pending");
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                alert("Error sending request: " + error.message);
+                btn.disabled = false;
+                btn.innerHTML = "Submit Deposit Request";
+            });
+        });
+    </script>
+</body>
+</html>

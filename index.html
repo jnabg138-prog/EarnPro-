@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - EarnPro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div id="loader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; color: #38bdf8; display: flex; justify-content: center; align-items: center; z-index: 9999; font-weight: bold;">
+        <i class="fa-solid fa-circle-notch fa-spin" style="margin-right: 10px;"></i> Loading Data...
+    </div>
+
+    <nav class="navbar" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; background: #1e293b; border-bottom: 1px solid #334155; text-align: center;">
+        <div id="profileCircle" onclick="window.location.href='profile.html'" style="width: 80px; height: 80px; border-radius: 50%; background: #0f172a; border: 3px solid #38bdf8; display: flex; justify-content: center; align-items: center; cursor: pointer; overflow: hidden; position: relative; margin-bottom: 10px; box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);">
+            <i id="defaultGenderIcon" class="fa-solid fa-venus-mars" style="font-size: 35px; color: #38bdf8;"></i>
+            <img id="dashboardAvatar" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+        </div>
+        
+        <div id="userName" style="font-weight: bold; color: #fff; font-size: 18px; margin-bottom: 6px; letter-spacing: 0.5px;">Loading...</div>
+        <div id="userPlan" class="vip-badge" style="background:#38bdf8; color:#000; padding:2px 12px; border-radius:10px; font-size:11px; font-weight: bold; text-transform: uppercase;">Free</div>
+    </nav>
+
+    <div class="container" style="padding: 20px;">
+        <div class="card" style="border: 1px solid #38bdf8; text-align: center; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+            <p style="color: #38bdf8; font-size: 12px; margin: 0;">Available Balance</p>
+            <h1 id="userBalance" style="font-size: 36px; margin: 10px 0;">Rs. 0</h1>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                <button onclick="window.location.href='deposit.html'" style="width: auto; padding: 10px 20px; background: #38bdf8; border: none; border-radius: 6px; color: #000; font-weight: bold;">Deposit</button>
+                <button onclick="window.location.href='withdraw.html'" style="width: auto; padding: 10px 20px; background: transparent; border: 1px solid #38bdf8; color: #38bdf8; border-radius: 6px; font-weight: bold;">Withdraw</button>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+            <div class="card" style="margin:0; text-align: center; padding: 15px;">
+                <i class="fa-solid fa-list-check" style="color:#38bdf8; font-size: 20px;"></i>
+                <h3 id="taskCount" style="margin: 5px 0;">0</h3>
+                <p style="font-size: 11px; color: #94a3b8; margin: 0;">Tasks Left</p>
+            </div>
+            <div class="card" style="margin:0; text-align: center; padding: 15px;">
+                <i class="fa-solid fa-users" style="color:#deff9a; font-size: 20px;"></i>
+                <h3 id="refCount" style="margin: 5px 0;">0</h3>
+                <p style="font-size: 11px; color: #94a3b8; margin: 0;">Team Size</p>
+            </div>
+        </div>
+
+        <h3 style="color: #fff; font-size: 14px; margin-bottom: 10px; padding-left: 5px;">Main Menu</h3>
+        <div class="main-menu" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+            <div class="menu-item" onclick="window.location.href='tasks.html'" style="text-align:center; background:#1e293b; padding:15px; border-radius:8px; color:#fff; cursor:pointer;"><i class="fa-solid fa-play" style="color:#38bdf8; font-size:20px; margin-bottom:8px;"></i><br>Work</div>
+            <div class="menu-item" onclick="window.location.href='plans.html'" style="text-align:center; background:#1e293b; padding:15px; border-radius:8px; color:#fff; cursor:pointer;"><i class="fa-solid fa-gem" style="color:#eab308; font-size:20px; margin-bottom:8px;"></i><br>Plans</div>
+            <div class="menu-item" onclick="window.location.href='referral.html'" style="text-align:center; background:#1e293b; padding:15px; border-radius:8px; color:#fff; cursor:pointer;"><i class="fa-solid fa-user-plus" style="color:#deff9a; font-size:20px; margin-bottom:8px;"></i><br>Invite</div>
+            
+            <div class="menu-item" onclick="window.location.href='withdraw.html'" style="text-align:center; background:#1e293b; padding:15px; border-radius:8px; color:#fff; cursor:pointer;"><i class="fa-solid fa-money-bill-transfer" style="color:#f43f5e; font-size:20px; margin-bottom:8px;"></i><br>Withdraw</div>
+            <div class="menu-item" onclick="window.location.href='history.html'" style="text-align:center; background:#1e293b; padding:15px; border-radius:8px; color:#fff; cursor:pointer;"><i class="fa-solid fa-clock-history" style="color:#a855f7; font-size:20px; margin-bottom:8px;"></i><br>History</div>
+            <div class="menu-item" onclick="window.location.href='support.html'" style="text-align:center; background:#1e293b; padding:15px; border-radius:8px; color:#fff; cursor:pointer;"><i class="fa-solid fa-headset" style="color:#06b6d4; font-size:20px; margin-bottom:8px;"></i><br>Support</div>
+        </div>
+
+        <div style="margin-top: 25px; text-align: center;">
+            <button onclick="window.location.href='admin_panel.html'" style="background: #334155; color: #94a3b8; font-size: 11px; border: none; padding: 6px 12px; border-radius: 4px; width: auto; cursor: pointer;">
+                <i class="fa-solid fa-lock"></i> Admin Room
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAsUq4BEYktF7gTHMB3zaJNX-ugdPVTfoo",
+            authDomain: "earnpro-14953.firebaseapp.com",
+            databaseURL: "https://earnpro-14953-default-rtdb.firebaseio.com",
+            projectId: "earnpro-14953",
+            storageBucket: "earnpro-14953.firebasestorage.app",
+            messagingSenderId: "754662452601",
+            appId: "1:754662452601:web:0548a7ee79ffafc63f13a8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const phone = localStorage.getItem("currentUser");
+
+        if(!phone) {
+            window.location.href = 'login.html';
+        } else {
+            // --- Local Profile Image Loading Logic ---
+            const savedPic = localStorage.getItem("userPic_" + phone);
+            if(savedPic) {
+                document.getElementById("dashboardAvatar").src = savedPic;
+                document.getElementById("dashboardAvatar").style.display = "block";
+                document.getElementById("defaultGenderIcon").style.display = "none";
+            }
+
+            // --- Realtime Firebase Data Sync ---
+            const userRef = ref(db, 'users/' + phone);
+            onValue(userRef, (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    // Update User Name under the circle
+                    document.getElementById("userName").innerText = data.name;
+                    // Update Balance & Info
+                    document.getElementById("userBalance").innerText = "Rs. " + parseInt(data.balance || 0).toLocaleString();
+                    document.getElementById("userPlan").innerText = data.plan || "Free";
+                    document.getElementById("taskCount").innerText = data.dailyTasks || 0;
+                    document.getElementById("refCount").innerText = data.teamSize || 0;
+                    
+                    // Hide Loader once data is fetched
+                    document.getElementById("loader").style.display = "none";
+                }
+            });
+        }
+    </script>
+</body>
+</html>

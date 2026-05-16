@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar"><div class="logo" onclick="window.location.href='index.html'">← Back</div><div class="logo">Support</div><div></div></nav>
+    <div class="card" style="margin-top: 100px;">
+        <h2>Help Center</h2>
+        <textarea id="m" placeholder="Write problem..." style="width:100%; height:100px; background:rgba(255,255,255,0.1); color:white; border:none; padding:10px;"></textarea>
+        <button onclick="send()" style="width:100%; background:#25D366; margin-top:10px;">Chat on WhatsApp</button>
+    </div>
+    <script>
+        function send() {
+            let msg = document.getElementById("m").value;
+            window.open(`https://wa.me/923474383723?text=User: ${localStorage.getItem("userName")}%0AProblem: ${msg}`);
+        }
+    </script>
+</body>
+</html>

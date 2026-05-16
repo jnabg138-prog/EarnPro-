@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral - EarnPro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo" onclick="window.location.href='index.html'"><i class="fa-solid fa-arrow-left"></i> Back</div>
+        <div class="logo">My Team</div>
+        <div></div>
+    </nav>
+
+    <div class="card" style="margin-top: 20px;">
+        <i class="fa-solid fa-gift" style="font-size: 50px; color: #38bdf8;"></i>
+        <h3>Refer & Earn</h3>
+        
+        <div style="background: rgba(56, 189, 248, 0.1); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px dashed #38bdf8;">
+            <p style="font-size: 11px; color: #94a3b8;">YOUR UNIQUE CODE</p>
+            <h1 id="myUniqueCode" style="letter-spacing: 4px; color: #fff; margin: 10px 0;">---</h1>
+            <button onclick="copyRef()" style="width: auto; padding: 10px 25px; background: #38bdf8; color: #000;">
+                <i class="fa-solid fa-copy"></i> Copy Link
+            </button>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <div class="card" style="flex: 1; margin: 0; padding: 15px; background: #1e293b;">
+                <h2 id="totalInvites">0</h2>
+                <p style="font-size: 10px;">Total Invites</p>
+            </div>
+            <div class="card" style="flex: 1; margin: 0; padding: 15px; background: #1e293b;">
+                <h2 id="permBonus" style="color: #22c55e;">0</h2>
+                <p style="font-size: 10px;">Permanent Tasks</p>
+            </div>
+        </div>
+        
+        <p style="font-size: 11px; color: #94a3b8; margin-top: 20px; text-align: left;">
+            * Get <b>+2 tasks</b> for every new signup (1 day only).<br>
+            * Get <b>+2 tasks permanently</b> when your referral buys a plan!
+        </p>
+    </div>
+
+    <script>
+        const phone = localStorage.getItem("currentUser");
+        const user = JSON.parse(localStorage.getItem("user_" + phone));
+        
+        document.getElementById("myUniqueCode").innerText = user.myCode;
+
+        // Team Logic
+        let count = 0;
+        for (let i = 0; i < localStorage.length; i++) {
+            let key = localStorage.key(i);
+            if (key.startsWith("user_")) {
+                let u = JSON.parse(localStorage.getItem(key));
+                if (u.referredBy === user.myCode) count++;
+            }
+        }
+        document.getElementById("totalInvites").innerText = count;
+        document.getElementById("permBonus").innerText = user.bonusTasks || 0;
+
+        function copyRef() {
+            const link = "https://yourwebsite.com/signup.html?ref=" + user.myCode;
+            navigator.clipboard.writeText(link);
+            alert("Referral link copied!");
+        }
+    </script>
+</body>
+</html>

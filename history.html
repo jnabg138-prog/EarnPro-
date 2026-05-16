@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History - EarnPro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .history-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-pending { background: #eab308; color: #000; }
+        .status-approved { background: #22c55e; color: #fff; }
+        .status-rejected { background: #ef4444; color: #fff; }
+    </style>
+</head>
+<body>
+    <div id="loader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; color: #38bdf8; display: flex; justify-content: center; align-items: center; z-index: 9999; font-weight: bold;">
+        <i class="fa-solid fa-circle-notch fa-spin" style="margin-right: 10px;"></i> Loading History...
+    </div>
+
+    <nav class="navbar" style="display: flex; align-items: center; padding: 15px; background: #1e293b;">
+        <a href="index.html" style="color: #38bdf8; text-decoration: none; margin-right: 15px; font-size: 18px;"><i class="fa-solid fa-arrow-left"></i></a>
+        <div style="font-weight: bold; color: #fff; font-size: 16px;">Deposit History</div>
+    </nav>
+
+    <div class="container" style="padding: 20px;">
+        <p style="color: #94a3b8; font-size: 12px; margin-bottom: 20px; text-align: center;">Yahan aapki bheji gayi saari deposit requests ka live status show hoga.</p>
+
+        <div id="historyList">
+            </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAsUq4BEYktF7gTHMB3zaJNX-ugdPVTfoo",
+            authDomain: "earnpro-14953.firebaseapp.com",
+            databaseURL: "https://earnpro-14953-default-rtdb.firebaseio.com",
+            projectId: "earnpro-14953",
+            storageBucket: "earnpro-14953.firebasestorage.app",
+            messagingSenderId: "754662452601",
+            appId: "1:754662452601:web:0548a7ee79ffafc63f13a8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const phone = localStorage.getItem("currentUser");
+
+        if(!phone) {
+            window.location.href = 'login.html';
+        } else {
+            const depositsRef = ref(db, 'deposits');
+            
+            // Firebase se Realtime data read karna
+            onValue(depositsRef, (snapshot) => {
+                const historyContainer = document.getElementById("historyList");
+                historyContainer.innerHTML = ""; // Purana data clear karein
+                
+                const data = snapshot.val();
+                let hasRecords = false;
+
+                if (data) {
+                    // Loop through all deposits reverse order mein (latest upar aaye)
+                    Object.keys(data).reverse().forEach((key) => {
+                        const item = data[key];
+                        
+                        // Security Check: Sirf login user ka data filter karna
+                        if (item.user === phone) {
+                            hasRecords = true;
+                            
+                            // Status ke hisab se class set karna
+                            let statusClass = "status-pending";
+                            if (item.status === "Approved") statusClass = "status-approved";
+                            if (item.status === "Rejected") statusClass = "status-rejected";
+
+                            // UI Card banana
+                            const card = document.createElement("div");
+                            card.className = "history-card";
+                            card.innerHTML = `
+                                <div>
+                                    <h4 style="margin: 0 0 5px 0; color: #fff;">Rs. ${parseInt(item.amount).toLocaleString()}</h4>
+                                    <p style="margin: 0 0 3px 0; font-size: 11px; color: #38bdf8; letter-spacing: 0.5px;">TID: ${item.tid}</p>
+                                    <p style="margin: 0; font-size: 10px; color: #64748b;"><i class="fa-solid fa-calendar-days"></i> ${item.date}</p>
+                                </div>
+                                <div>
+                                    <span class="status-badge ${statusClass}">${item.status}</span>
+                                </div>
+                            `;
+                            historyContainer.appendChild(card);
+                        }
+                    });
+                }
+
+                // Agar user ki koi request na miley
+                if (!hasRecords) {
+                    historyContainer.innerHTML = `
+                        <div style="text-align: center; margin-top: 40px; color: #64748b;">
+                            <i class="fa-solid fa-folder-open" style="font-size: 40px; margin-bottom: 10px;"></i>
+                            <p style="font-size: 14px; margin: 0;">No transaction history found!</p>
+                        </div>
+                    `;
+                }
+
+                // Loader chupayein
+                document.getElementById("loader").style.display = "none";
+            });
+        }
+    </script>
+</body>
+</html>

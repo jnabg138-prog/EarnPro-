@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP Plans - EarnPro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .plans-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Mobile par 2 columns best hain */
+            gap: 15px;
+            padding: 15px;
+        }
+        .plan-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .plan-card:hover { border-color: #38bdf8; transform: translateY(-3px); }
+        .plan-name { color: #38bdf8; font-weight: bold; font-size: 18px; margin-bottom: 5px; }
+        .plan-price { font-size: 16px; font-weight: bold; color: #fff; margin-bottom: 10px; }
+        .plan-details { font-size: 12px; color: #94a3b8; margin-bottom: 15px; line-height: 1.4; }
+        .buy-btn {
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo" onclick="window.location.href='index.html'"><i class="fa-solid fa-arrow-left"></i> Back</div>
+        <div class="logo">Investment Plans</div>
+        <div></div>
+    </nav>
+
+    <div class="plans-grid">
+        <div class="plan-card">
+            <div class="plan-name">VIP 1</div>
+            <div class="plan-price">Rs. 1,500</div>
+            <div class="plan-details">Daily Ads: 5<br>Daily Earn: Rs. 75</div>
+            <button class="buy-btn" onclick="buyPlan(1500)">Buy Now</button>
+        </div>
+
+        <div class="plan-card">
+            <div class="plan-name">VIP 2</div>
+            <div class="plan-price">Rs. 3,000</div>
+            <div class="plan-details">Daily Ads: 12<br>Daily Earn: Rs. 160</div>
+            <button class="buy-btn" onclick="buyPlan(3000)">Buy Now</button>
+        </div>
+
+        <div class="plan-card">
+            <div class="plan-name">VIP 3</div>
+            <div class="plan-price">Rs. 5,000</div>
+            <div class="plan-details">Daily Ads: 22<br>Daily Earn: Rs. 300</div>
+            <button class="buy-btn" onclick="buyPlan(5000)">Buy Now</button>
+        </div>
+
+        <div class="plan-card">
+            <div class="plan-name">VIP 4</div>
+            <div class="plan-price">Rs. 10,000</div>
+            <div class="plan-details">Daily Ads: 45<br>Daily Earn: Rs. 650</div>
+            <button class="buy-btn" onclick="buyPlan(10000)">Buy Now</button>
+        </div>
+
+        <div class="plan-card">
+            <div class="plan-name">VIP 5</div>
+            <div class="plan-price">Rs. 25,000</div>
+            <div class="plan-details">Daily Ads: 110<br>Daily Earn: Rs. 1,700</div>
+            <button class="buy-btn" onclick="buyPlan(25000)">Buy Now</button>
+        </div>
+
+        <div class="plan-card">
+            <div class="plan-name">VIP 6</div>
+            <div class="plan-price">Rs. 50,000</div>
+            <div class="plan-details">Daily Ads: 230<br>Daily Earn: Rs. 3,500</div>
+            <button class="buy-btn" onclick="buyPlan(50000)">Buy Now</button>
+        </div>
+
+        <div class="plan-card">
+            <div class="plan-name">VIP 7</div>
+            <div class="plan-price">Rs. 75,000</div>
+            <div class="plan-details">Daily Ads: 350<br>Daily Earn: Rs. 5,500</div>
+            <button class="buy-btn" onclick="buyPlan(75000)">Buy Now</button>
+        </div>
+
+        <div class="plan-card">
+            <div class="plan-name">VIP 8</div>
+            <div class="plan-price">Rs. 100,000</div>
+            <div class="plan-details">Daily Ads: 500<br>Daily Earn: Rs. 8,000</div>
+            <button class="buy-btn" onclick="buyPlan(100000)">Buy Now</button>
+        </div>
+
+        <div class="plan-card">
+            <div class="plan-name">VIP 9</div>
+            <div class="plan-price">Rs. 150,000</div>
+            <div class="plan-details">Daily Ads: 800<br>Daily Earn: Rs. 13,000</div>
+            <button class="buy-btn" onclick="buyPlan(150000)">Buy Now</button>
+        </div>
+
+        <div class="plan-card">
+            <div class="plan-name">VIP 10</div>
+            <div class="plan-price">Rs. 200,000</div>
+            <div class="plan-details">Daily Ads: 1100<br>Daily Earn: Rs. 18,000</div>
+            <button class="buy-btn" onclick="buyPlan(200000)">Buy Now</button>
+        </div>
+
+        <div class="plan-card">
+            <div class="plan-name">VIP 11</div>
+            <div class="plan-price">Rs. 225,000</div>
+            <div class="plan-details">Daily Ads: 1300<br>Daily Earn: Rs. 21,000</div>
+            <button class="buy-btn" onclick="buyPlan(225000)">Buy Now</button>
+        </div>
+
+        <div class="plan-card">
+            <div class="plan-name">VIP 12</div>
+            <div class="plan-price">Rs. 250,000</div>
+            <div class="plan-details">Daily Ads: 1600<br>Daily Earn: Rs. 25,000</div>
+            <button class="buy-btn" onclick="buyPlan(250000)">Buy Now</button>
+        </div>
+    </div>
+
+    <script>
+        function buyPlan(amount) {
+            // Amount ko temporary save karna taake deposit page par utha saken
+            localStorage.setItem("selectedPlanAmount", amount);
+            // Deposit page par bhej dena
+            window.location.href = 'deposit.html';
+        }
+    </script>
+</body>
+</html>

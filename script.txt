@@ -1,0 +1,28 @@
+// Pehle se save shuda balance check karna
+let balance = localStorage.getItem("myBalance") ? parseInt(localStorage.getItem("myBalance")) : 0;
+
+// Page load hote hi purana balance dikhana
+document.getElementById("balance").innerText = "Rs. " + balance + ".00";
+
+function addMoney() {
+    balance = balance + 50;
+    
+    // Screen par dikhana
+    document.getElementById("balance").innerText = "Rs. " + balance + ".00";
+    
+    // Mobile ki memory mein save karna
+    localStorage.setItem("myBalance", balance);
+    
+    alert("Rs. 50 save ho gaye hain!");
+}
+function showDeposit() {
+    alert("Deposit system jald aa raha hai! Aap JazzCash/EasyPaisa se pay kar sakein ge.");
+}
+
+function showWithdraw() {
+    if(balance < 500) {
+        alert("Kam az kam Rs. 500 hona zaroori hain withdraw ke liye!");
+    } else {
+        alert("Withdraw request bhej di gayi hai!");
+    }
+}
