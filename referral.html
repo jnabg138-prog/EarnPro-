@@ -7,4 +7,99 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
         body { background: #0d1117; color: #c9d1d9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 30px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 8px 24px rgba(0,
+        .container { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 30px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+        h2 { color: #58a6ff; margin-bottom: 25px; font-size: 24px; }
+        .code-box { background: #0d1117; border: 2px dashed #30363d; border-radius: 8px; padding: 20px; margin-bottom: 25px; }
+        .code-box p { font-size: 12px; color: #8b949e; letter-spacing: 1px; margin-bottom: 10px; }
+        .code-box h1 { font-size: 32px; color: #1f6feb; letter-spacing: 2px; margin-bottom: 15px; }
+        .btn { background: #38bdf8; color: #0f172a; border: none; padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; transition: 0.2s; }
+        .btn:hover { background: #0ea5e9; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .stat-card { background: #21262d; border: 1px solid #30363d; padding: 15px; border-radius: 8px; }
+        .stat-card h3 { font-size: 24px; color: #38bdf8; margin-bottom: 5px; }
+        .stat-card p { font-size: 12px; color: #8b949e; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Refer & Earn</h2>
+        
+        <div class="code-box">
+            <p>YOUR UNIQUE CODE</p>
+            <h1 id="myUniqueCode">Loading...</h1>
+            <button onclick="copyRef()" class="btn">🔗 Copy Link</button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3 id="totalInvites">0</h3>
+                <p>Total Invites</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="permBonus">0</h3>
+                <p>Permanent Tasks</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="script.js"></script>
+    
+    <script>
+        // Aapke login.html ke mutabiq exact "currentUser" dhoond raha hai
+        const phone = localStorage.getItem("currentUser");
+
+        if (!phone) {
+            alert("Pehle login karein!");
+            window.location.href = "login.html";
+        } else {
+            // Database se user ka real path check karna
+            const userRef = firebase.database().ref("users/" + phone);
+            
+            userRef.on("value", (snapshot) => {
+                const user = snapshot.val();
+                if (user) {
+                    // Agar signup ke waqt code ban chuka hai toh vahi uthaye ga
+                    let myCode = user.myCode || "No Code";
+                    
+                    document.getElementById("myUniqueCode").innerText = myCode;
+                    document.getElementById("permBonus").innerText = user.bonusTasks || 0;
+
+                    // Total invites calculate karne ka system
+                    firebase.database().ref("users").once("value", (allUsersSnapshot) => {
+                        let count = 0;
+                        allUsersSnapshot.forEach((childSnapshot) => {
+                            const u = childSnapshot.val();
+                            if (u.referredBy === myCode) {
+                                count++;
+                            }
+                        });
+                        document.getElementById("totalInvites").innerText = count;
+                    });
+                } else {
+                    document.getElementById("myUniqueCode").innerText = "Error Loading";
+                }
+            });
+        }
+
+        // Link Copy karne ka system
+        function copyRef() {
+            const codeText = document.getElementById("myUniqueCode").innerText;
+            if(codeText === "Loading..." || codeText === "Error Loading") {
+                alert("Pehle apna code load hone edin!");
+                return;
+            }
+            
+            const link = "https://jnabg138-prog.github.io/EarnPro-/signup.html?ref=" + codeText;
+            
+            navigator.clipboard.writeText(link).then(() => {
+                alert("Referral link copy ho gaya hai:\n" + link);
+            }).catch(err => {
+                alert("Is link ko manually copy kar lein:\n" + link);
+            });
+        }
+    </script>
+</body>
+</html>
