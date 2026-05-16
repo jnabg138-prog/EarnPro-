@@ -47,24 +47,22 @@
 
     <script src="script.js"></script>
     <script>
-        // Random Code Banane Ka Function
         function makeRandomCode() {
-            let result = 'EP'; // EarnPro Prefix
-            let characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No confusing characters like I, O, 1, 0
+            let result = 'EP';
+            let characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
             for (let i = 0; i < 4; i++) {
                 result += characters.charAt(Math.floor(Math.random() * characters.length));
             }
             return result;
         }
 
-        // LocalStorage se login phone number uthana
-        const phone = localStorage.getItem("myPhone");
+        // Dono options check kar rha hai taake error na aaye
+        let phone = localStorage.getItem("myPhone") || localStorage.getItem("phone") || localStorage.getItem("userPhone");
 
         if (!phone) {
             alert("Pehle login karein!");
             window.location.href = "login.html";
         } else {
-            // Database se user check karna
             const userRef = firebase.database().ref("users/" + phone);
             
             userRef.on("value", (snapshot) => {
@@ -72,17 +70,14 @@
                 if (user) {
                     let myCode = user.myCode;
                     
-                    // Agar database mein code nahi bana hua toh naya bana kar save karo
                     if (!myCode || myCode === "No Code" || myCode === "") {
                         myCode = makeRandomCode();
                         userRef.update({ myCode: myCode });
                     }
                     
-                    // Screen par code dikhao
                     document.getElementById("myUniqueCode").innerText = myCode;
                     document.getElementById("permBonus").innerText = user.bonusTasks || 0;
 
-                    // Invites count karne ka system
                     firebase.database().ref("users").once("value", (allUsersSnapshot) => {
                         let count = 0;
                         allUsersSnapshot.forEach((childSnapshot) => {
@@ -99,21 +94,16 @@
             });
         }
 
-        // Link Copy karne ka system
         function copyRef() {
             const codeText = document.getElementById("myUniqueCode").innerText;
             if(codeText === "Loading..." || codeText === "Error Loading") {
                 alert("Pehle apna code load hone dein!");
                 return;
             }
-            
-            // Aapka exact live GitHub website link
             const link = "https://jnabg138-prog.github.io/EarnPro-/signup.html?ref=" + codeText;
-            
             navigator.clipboard.writeText(link).then(() => {
                 alert("Mubarak ho! Referral link copy ho gaya hai:\n" + link);
             }).catch(err => {
-                // Agar automatic copy na ho toh alert mein dikha dega
                 alert("Is link ko manually copy kar lein:\n" + link);
             });
         }
