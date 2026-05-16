@@ -4,7 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Refer & Earn - EarnPro</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        body { background: #0d1117; color: #c9d1d9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 30px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+        h2 { color: #58a6ff; margin-bottom: 25px; font-size: 24px; }
+        .code-box { background: #0d1117; border: 2px dashed #30363d; border-radius: 8px; padding: 20px; margin-bottom: 25px; }
+        .code-box p { font-size: 12px; color: #8b949e; letter-spacing: 1px; margin-bottom: 10px; }
+        .code-box h1 { font-size: 32px; color: #1f6feb; letter-spacing: 2px; margin-bottom: 15px; }
+        .btn { background: #238636; color: white; border: none; padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; transition: 0.2s; }
+        .btn:hover { background: #2ea44f; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .stat-card { background: #21262d; border: 1px solid #30363d; padding: 15px; border-radius: 8px; }
+        .stat-card h3 { font-size: 24px; color: #58a6ff; margin-bottom: 5px; }
+        .stat-card p { font-size: 12px; color: #8b949e; }
+    </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
@@ -25,4 +39,84 @@
                 <p>Total Invites</p>
             </div>
             <div class="stat-card">
-                <h3 id="perm
+                <h3 id="permBonus">0</h3>
+                <p>Permanent Tasks</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Random Code Banane Ka Function
+        function makeRandomCode() {
+            let result = 'EP'; // EarnPro Prefix
+            let characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No confusing characters like I, O, 1, 0
+            for (let i = 0; i < 4; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+
+        // LocalStorage se login phone number uthana
+        const phone = localStorage.getItem("myPhone");
+
+        if (!phone) {
+            alert("Pehle login karein!");
+            window.location.href = "login.html";
+        } else {
+            // Database se user check karna
+            const userRef = firebase.database().ref("users/" + phone);
+            
+            userRef.on("value", (snapshot) => {
+                const user = snapshot.val();
+                if (user) {
+                    let myCode = user.myCode;
+                    
+                    // Agar database mein code nahi bana hua toh naya bana kar save karo
+                    if (!myCode || myCode === "No Code" || myCode === "") {
+                        myCode = makeRandomCode();
+                        userRef.update({ myCode: myCode });
+                    }
+                    
+                    // Screen par code dikhao
+                    document.getElementById("myUniqueCode").innerText = myCode;
+                    document.getElementById("permBonus").innerText = user.bonusTasks || 0;
+
+                    // Invites count karne ka system
+                    firebase.database().ref("users").once("value", (allUsersSnapshot) => {
+                        let count = 0;
+                        allUsersSnapshot.forEach((childSnapshot) => {
+                            const u = childSnapshot.val();
+                            if (u.referredBy === myCode) {
+                                count++;
+                            }
+                        });
+                        document.getElementById("totalInvites").innerText = count;
+                    });
+                } else {
+                    document.getElementById("myUniqueCode").innerText = "Error Loading";
+                }
+            });
+        }
+
+        // Link Copy karne ka system
+        function copyRef() {
+            const codeText = document.getElementById("myUniqueCode").innerText;
+            if(codeText === "Loading..." || codeText === "Error Loading") {
+                alert("Pehle apna code load hone dein!");
+                return;
+            }
+            
+            // Aapka exact live GitHub website link
+            const link = "https://jnabg138-prog.github.io/EarnPro-/signup.html?ref=" + codeText;
+            
+            navigator.clipboard.writeText(link).then(() => {
+                alert("Mubarak ho! Referral link copy ho gaya hai:\n" + link);
+            }).catch(err => {
+                // Agar automatic copy na ho toh alert mein dikha dega
+                alert("Is link ko manually copy kar lein:\n" + link);
+            });
+        }
+    </script>
+</body>
+</html>
