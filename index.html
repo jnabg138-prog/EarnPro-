@@ -90,12 +90,13 @@
                 const data = snapshot.val();
                 if(data) {
                     document.getElementById("userName").innerText = data.name;
+                    
+                    // Available Balance mein sirf task rewards show honge (Admin panel approve ke waqt balance field ko mat chhere, sirf plan badle)
                     document.getElementById("userBalance").innerText = "Rs. " + parseInt(data.balance || 0).toLocaleString();
                     
                     let currentPlan = data.plan || "Free";
                     document.getElementById("userPlan").innerText = currentPlan;
                     
-                    // --- PLAN WISE AUTOMATIC TASK LIMIT CALCULATION ---
                     let maxTasks = 2;
                     if(currentPlan === "Free") maxTasks = 2;
                     else if(currentPlan === "Basic") maxTasks = 5;
@@ -106,9 +107,8 @@
 
                     let doneTasks = parseInt(data.tasksDone || 0);
                     let leftTasks = maxTasks - doneTasks;
-                    if(leftTasks < 0) leftTasks = 0; // Negative values rokne ke liye
+                    if(leftTasks < 0) leftTasks = 0;
 
-                    // Tasks Left screen par auto display karna
                     document.getElementById("taskCount").innerText = leftTasks;
                     document.getElementById("refCount").innerText = data.teamSize || 0;
                     
@@ -118,4 +118,4 @@
         }
     </script>
 </body>
-    </html>
+</html>
