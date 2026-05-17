@@ -55,8 +55,7 @@
             <div class="menu-item" onclick="window.location.href='history.html'" style="text-align:center; background:#1e293b; padding:15px; border-radius:8px; color:#fff; cursor:pointer;"><i class="fa-solid fa-clock-history" style="color:#a855f7; font-size:20px; margin-bottom:8px;"></i><br>History</div>
             <div class="menu-item" onclick="window.location.href='support.html'" style="text-align:center; background:#1e293b; padding:15px; border-radius:8px; color:#fff; cursor:pointer;"><i class="fa-solid fa-headset" style="color:#06b6d4; font-size:20px; margin-bottom:8px;"></i><br>Support</div>
         </div>
-
-        
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
@@ -79,7 +78,6 @@
         if(!phone) {
             window.location.href = 'login.html';
         } else {
-            // --- Local Profile Image Loading Logic ---
             const savedPic = localStorage.getItem("userPic_" + phone);
             if(savedPic) {
                 document.getElementById("dashboardAvatar").src = savedPic;
@@ -87,20 +85,33 @@
                 document.getElementById("defaultGenderIcon").style.display = "none";
             }
 
-            // --- Realtime Firebase Data Sync ---
             const userRef = ref(db, 'users/' + phone);
             onValue(userRef, (snapshot) => {
                 const data = snapshot.val();
                 if(data) {
-                    // Update User Name under the circle
                     document.getElementById("userName").innerText = data.name;
-                    // Update Balance & Info
                     document.getElementById("userBalance").innerText = "Rs. " + parseInt(data.balance || 0).toLocaleString();
-                    document.getElementById("userPlan").innerText = data.plan || "Free";
-                    document.getElementById("taskCount").innerText = data.dailyTasks || 0;
+                    
+                    let currentPlan = data.plan || "Free";
+                    document.getElementById("userPlan").innerText = currentPlan;
+                    
+                    // --- PLAN WISE AUTOMATIC TASK LIMIT CALCULATION ---
+                    let maxTasks = 2;
+                    if(currentPlan === "Free") maxTasks = 2;
+                    else if(currentPlan === "Basic") maxTasks = 5;
+                    else if(currentPlan === "Silver") maxTasks = 7;
+                    else if(currentPlan === "Golden") maxTasks = 9;
+                    else if(currentPlan === "Premium") maxTasks = 13;
+                    else maxTasks = parseInt(data.dailyTasks || 2);
+
+                    let doneTasks = parseInt(data.tasksDone || 0);
+                    let leftTasks = maxTasks - doneTasks;
+                    if(leftTasks < 0) leftTasks = 0; // Negative values rokne ke liye
+
+                    // Tasks Left screen par auto display karna
+                    document.getElementById("taskCount").innerText = leftTasks;
                     document.getElementById("refCount").innerText = data.teamSize || 0;
                     
-                    // Hide Loader once data is fetched
                     document.getElementById("loader").style.display = "none";
                 }
             });
