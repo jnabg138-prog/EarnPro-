@@ -26,3 +26,7 @@ function showWithdraw() {
         alert("Withdraw request bhej di gayi hai!");
     }
 }
+// Monetag Direct Ad Link Function
+function openMonetagAd() {
+    window.open("https://omg10.com/4/11022523", "_blank");
+}
