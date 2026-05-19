@@ -6,135 +6,53 @@
     <title>Tasks - EarnPro</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .video-box { background: #1e293b; padding: 15px; border-radius: 15px; text-align: center; margin-top: 20px; }
-        iframe { width: 100%; height: 200px; border-radius: 10px; border: none; }
-        .timer { font-size: 24px; color: #fbbf24; margin: 15px 0; }
+        .video-box { 
+            background: #1e293b; 
+            padding: 15px; 
+            border-radius: 15px; 
+            text-align: center; 
+            margin-top: 20px; 
+        }
+        iframe { 
+            width: 100%; 
+            height: 200px; 
+            border-radius: 10px; 
+            border: none; 
+        }
+        .timer { 
+            font-size: 24px; 
+            color: #fbbf24; 
+            margin: 15px 0; 
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
+
     <nav class="navbar">
         <div class="logo" onclick="window.location.href='index.html'">← Back</div>
         <div class="logo">Daily Tasks</div>
         <div></div>
     </nav>
-    
-    <div class="card" style="margin-top: 80px;">
-        <h3 id="p-name">Loading Plan...</h3>
-        <p id="t-count">Tasks: 0/0</p>
-        <div class="video-box" id="v-area">
-            <p id="r-text" style="color: #22c55e;">Reward: Rs. 0</p>
-            <iframe src="https://www.youtube.com/embed/ScMzIvxBSi4"></iframe>
+
+    <div class="container">
+        <div class="Card" style="margin-top: 80px;">
+            <h3 id="p-name">Loading Plan...</h3>
+            <p id="t-count">Tasks: 0/0</p>
+            
+            <div class="video-box" id="v-area">
+                </div>
+            
             <div class="timer" id="timer">Wait for Start</div>
+            
             <button id="s-btn" onclick="start()" style="width: 100%; background: #22c55e; color: white; font-weight: bold;">Start Task</button>
-            <button id="c-btn" onclick="claim()" style="width: 100%; background: #38bdf8; color: #0f172a; font-weight: bold; padding: 12px; border: none; border-radius: 5px; display: none; cursor: pointer;">Claim Reward</button>
+            <button id="c-btn" onclick="claim()" style="width: 100%; background: #38bdf8; color: #0f172a; font-weight: bold; display: none;">Claim Reward</button>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-        import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="script.js"></script>
 
-        // Firebase Configuration (Same as login/signup)
-        const firebaseConfig = {
-            apiKey: "AIzaSyAsUq4BEYktF7gTHMB3zaJNX-ugdPVTfoo",
-            authDomain: "earnpro-14953.firebaseapp.com",
-            databaseURL: "https://earnpro-14953-default-rtdb.firebaseio.com",
-            projectId: "earnpro-14953",
-            storageBucket: "earnpro-14953.firebasestorage.app",
-            messagingSenderId: "754662452601",
-            appId: "1:754662452601:web:0548a7ee79ffafc63f13a8"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        // Global Variables Setup
-        let currentBalance = 0;
-        let tasksDoneToday = 0;
-        let totalLimit = 2;
-        let taskReward = 18;
-        let taskTime = 120; // 120 seconds for free
-
-        // User Login Check karna
-        const phone = localStorage.getItem("currentUser");
-        if(!phone) {
-            alert("Pehle login karein!");
-            window.location.href = 'login.html';
-        }
-
-        // Database se Live Data fetch karna
-        const userRef = ref(db, 'users/' + phone);
-        get(userRef).then((snapshot) => {
-            if(snapshot.exists()) {
-                const userData = snapshot.val();
-                
-                currentBalance = parseInt(userData.balance || 0);
-                tasksDoneToday = parseInt(userData.tasksDone || 0); // Database mein kitne tasks kar liye
-                let currentPlan = userData.plan || "Free";
-
-                // Plans Data Configuration
-                if(currentPlan === "Free") { totalLimit = 2; taskReward = 18; taskTime = 120; }
-                else if(currentPlan === "Basic") { totalLimit = 5; taskReward = 33; taskTime = 148; }
-                else if(currentPlan === "Silver") { totalLimit = 7; taskReward = 33; taskTime = 148; }
-                else if(currentPlan === "Golden") { totalLimit = 9; taskReward = 33; taskTime = 148; }
-                else if(currentPlan === "Premium") { totalLimit = 13; taskReward = 33; taskTime = 148; }
-                else { totalLimit = parseInt(userData.dailyTasks || 2); taskReward = 33; taskTime = 148; }
-
-                // Screen par details show karna
-                document.getElementById("p-name").innerText = currentPlan + " Plan";
-                document.getElementById("t-count").innerText = "Tasks: " + tasksDoneToday + "/" + totalLimit;
-                document.getElementById("r-text").innerText = "Reward: Rs. " + taskReward;
-
-                // Agar limit poori ho chuki ho
-                if(tasksDoneToday >= totalLimit) {
-                    document.getElementById("v-area").innerHTML = "<h3 style='color: #ef4444; margin: 20px 0;'>Daily Limit Reached!</h3><p>Aapke aaj ke saare tasks mukammal ho chuke hain.</p>";
-                }
-            } else {
-                alert("User data not found!");
-            }
-        }).catch((err) => {
-            console.error("Error loading data: " + err.message);
-        });
-
-        // Task start karne ka function
-        window.start = function() {
-            document.getElementById("s-btn").style.display = "none";
-            let timeLeft = taskTime;
-            document.getElementById("timer").innerText = timeLeft + "s";
-
-            let countdown = setInterval(() => {
-                timeLeft--;
-                document.getElementById("timer").innerText = timeLeft + "s";
-                if(timeLeft <= 0) {
-                    clearInterval(countdown);
-                    document.getElementById("timer").style.display = "none";
-                    document.getElementById("c-btn").style.display = "block";
-                }
-            }, 1000);
-        }
-
-        // Reward claim karke database mein update karne ka function
-        window.claim = function() {
-            const btn = document.getElementById("c-btn");
-            btn.disabled = true;
-            btn.innerHTML = "Adding Reward...";
-
-            let newBalance = currentBalance + taskReward;
-            let newTasksDone = tasksDoneToday + 1;
-
-            // Database Ke Andar Direct Live Update!
-            update(userRef, {
-                balance: newBalance,
-                tasksDone: newTasksDone
-            }).then(() => {
-                alert("Mubarak ho! Rs. " + taskReward + " aapke account mein add ho gaye hain.");
-                window.location.href = "index.html";
-            }).catch((err) => {
-                alert("Reward save karne mein masla aaya: " + err.message);
-                btn.disabled = false;
-                btn.innerHTML = "Claim Reward";
-            });
-        }
-    </script>
 </body>
-    </html>
+</html>
