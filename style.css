@@ -1,97 +1,100 @@
-// Firebase Configuration (Same as login/signup)
-const firebaseConfig = {
-    apiKey: "AIzaSyAxkoq0EY9xsF7gTthM3ZajNX-upWVTfmo",
-    authDomain: "earnpro-14953.firebaseapp.com",
-    databaseURL: "https://earnpro-14953-default-rtdb.firebaseio.com",
-    projectId: "earnpro-14953",
-    storageBucket: "earnpro-14953.appspot.com",
-    messagingSenderId: "754662452601",
-    appId: "1:754662452601:web:0548a7ee70ffa1c31f3ad7"
-};
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-// Global Variables Setup
-let currentBalance = 0;
-let tasksDoneToday = 0;
-let totalLimit = 2;
-let taskReward = 18;
-let taskTime = 120; // 120 seconds for Free
-
-// User Login Check karna
-const phone = localStorage.getItem("currentUser");
-if (!phone) {
-    alert("Pehle Login karein!");
-    window.location.href = "login.html";
+/* EarnPro Global Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
 }
 
-// Database se Live Data fetch karna
-const userRef = db.ref("users/" + phone);
-userRef.on("value", (snapshot) => {
-    if (snapshot.exists()) {
-        const userData = snapshot.val();
-        
-        currentBalance = parseInt(userData.balance || 0);
-        tasksDoneToday = parseInt(userData.tasksDone || 0);
-        let currentPlan = userData.plan || "Free";
-        
-        // Plans Data Configuration
-        if (currentPlan === "Free") { totalLimit = 2; taskReward = 18; taskTime = 120; }
-        else if (currentPlan === "Basic") { totalLimit = 5; taskReward = 33; taskTime = 100; }
-        else if (currentPlan === "Standard") { totalLimit = 10; taskReward = 50; taskTime = 80; }
-        else if (currentPlan === "Premium") { totalLimit = 15; taskReward = 70; taskTime = 60; }
-        else if (currentPlan === "Ultimate") { totalLimit = 25; taskReward = 100; taskTime = 40; }
-        
-        // UI text update karna
-        document.getElementById("p-name").innerText = currentPlan + " Plan";
-        document.getElementById("t-count").innerText = "Tasks: " + tasksDoneToday + "/" + totalLimit;
-        document.getElementById("v-area").innerHTML = `<p id="r-text" style="color: #38bdf8; font-size: 14px; font-weight: bold; margin-bottom: 10px;">Reward: Rs. ${taskReward}</p>
-        <iframe src="https://www.youtube.com/embed/ScWrIexB5i4" style="width: 100%; height: 200px; border-radius: 10px; border: none;"></iframe>`;
+body {
+    background-color: #0f172a; /* Dark Blue Theme */
+    color: #ffffff;
+    padding-bottom: 60px;
+}
+
+/* Navbar Styling */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1e293b;
+    padding: 15px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    font-size: 18px;
+    font-weight: bold;
+    color: #38bdf8;
+    cursor: pointer;
+}
+
+/* Container & Cards */
+.container {
+    padding: 20px;
+}
+
+.card {
+    background-color: #1e293b;
+    border: 1px solid #38bdf8;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Video Box Style */
+.video-box {
+    background-color: #1e293b;
+    padding: 15px;
+    border-radius: 15px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+iframe {
+    width: 100%;
+    height: 200px;
+    border-radius: 10px;
+    border: none;
+}
+
+/* Buttons */
+button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: 0.3s ease;
+}
+
+#s-btn {
+    background-color: #22c55e;
+    color: white;
+}
+
+#c-btn {
+    background-color: #38bdf8;
+    color: #0f172a;
+}
+
+.timer {
+    font-size: 24px;
+    color: #fbbf24;
+    margin: 15px 0;
+    font-weight: bold;
+}
+
+/* Grid Layout for Stats */
+.grid-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
     }
-});
-
-// START TASK FUNCTION (Yahan Ad setup kar diya hai)
-function start() {
-    if (tasksDoneToday >= totalLimit) {
-        alert("Aapki aaj ki task limit khatam ho chuki hai!");
-        return;
-    }
-    
-    // 1. User jaise hi click karega, pehle automatic Monetag ka Ad khulega
-    window.open("https://omg10.com/4/11022523", "_blank");
-
-    // 2. Sath hi piche task ka timer aur process shuru ho jayega
-    document.getElementById("s-btn").style.display = "none";
-    let timeLeft = taskTime;
-    
-    const timerInterval = setInterval(() => {
-        document.getElementById("timer").innerText = "Wait: " + timeLeft + "s";
-        timeLeft--;
-        
-        if (timeLeft < 0) {
-            clearInterval(timerInterval);
-            document.getElementById("timer").innerText = "Task Complete!";
-            document.getElementById("c-btn").style.display = "block";
-        }
-    }, 1000);
-}
-
-// CLAIM REWARD FUNCTION
-function claim() {
-    const newBalance = currentBalance + taskReward;
-    const newTasksDone = tasksDoneToday + 1;
-    
-    userRef.update({
-        balance: newBalance,
-        tasksDone: newTasksDone
-    }).then(() => {
-        alert("Mubarak ho! Reward aapke balance mein add kar diya gaya hai.");
-        document.getElementById("c-btn").style.display = "none";
-        document.getElementById("s-btn").style.display = "block";
-        document.getElementById("timer").innerText = "Wait for Start";
-    }).catch((error) => {
-        alert("Error: " + error.message);
-    });
-}
