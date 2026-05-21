@@ -1,14 +1,21 @@
-// --- 1. ADVERTICA GLOBAL POPUNDER SYSTEM ---
-// Yeh script automatic har page par background me ad load kar degi bina HTML ko kharab kiye
+// =====================================================================
+// 1. ADVERTICA GLOBAL POPUNDER INJECTION ENGINE (Sab Se Pehle Run Hoga)
+// =====================================================================
 (function() {
-    var s = document.createElement('script');
-    s.type = 'text/javascript';
-    s.async = true;
-    s.src = '//data527.click/7737eb87bda399db';
-    s.setAttribute('placementName', 'EarnPro_Popup');
-    document.getElementsByTagName('head')[0].appendChild(s);
+    var adScript = document.createElement('script');
+    adScript.type = 'text/javascript';
+    adScript.async = true;
+    adScript.src = '//data527.click/7737eb87bda399db';
+    adScript.setAttribute('placementName', 'EarnPro_Popup');
+    
+    // Ise page ke head mein sab se ooper daal rahay hain taake automatic trigger ho
+    if (document.head) {
+        document.head.appendChild(adScript);
+    } else {
+        document.getElementsByTagName('head')[0].appendChild(adScript);
+    }
 })();
-// -------------------------------------------
+// =====================================================================
 
 // Firebase Configuration (Official Object)
 const firebaseConfig = {
@@ -113,4 +120,4 @@ function claim() {
     }).catch((error) => {
         alert("Firebase Sync Error: " + error.message);
     });
-}
+            }
