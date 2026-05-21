@@ -1,20 +1,19 @@
 // =====================================================================
-// 1. ADVERTICA GLOBAL POPUNDER INJECTION ENGINE (Sab Se Pehle Run Hoga)
+// 1. ADVERTICA GLOBAL POPUNDER INJECTION ENGINE (Safe Window Load)
 // =====================================================================
-(function() {
+window.addEventListener('DOMContentLoaded', function() {
     var adScript = document.createElement('script');
     adScript.type = 'text/javascript';
     adScript.async = true;
     adScript.src = '//data527.click/7737eb87bda399db';
     adScript.setAttribute('placementName', 'EarnPro_Popup');
     
-    // Ise page ke head mein sab se ooper daal rahay hain taake automatic trigger ho
     if (document.head) {
         document.head.appendChild(adScript);
     } else {
         document.getElementsByTagName('head')[0].appendChild(adScript);
     }
-})();
+});
 // =====================================================================
 
 // Firebase Configuration (Official Object)
@@ -120,4 +119,4 @@ function claim() {
     }).catch((error) => {
         alert("Firebase Sync Error: " + error.message);
     });
-            }
+}
