@@ -1,3 +1,15 @@
+// --- 1. ADVERTICA GLOBAL POPUNDER SYSTEM ---
+// Yeh script automatic har page par background me ad load kar degi bina HTML ko kharab kiye
+(function() {
+    var s = document.createElement('script');
+    s.type = 'text/javascript';
+    s.async = true;
+    s.src = '//data527.click/7737eb87bda399db';
+    s.setAttribute('placementName', 'EarnPro_Popup');
+    document.getElementsByTagName('head')[0].appendChild(s);
+})();
+// -------------------------------------------
+
 // Firebase Configuration (Official Object)
 const firebaseConfig = {
     apiKey: "AIzaSyAxkoq0EY9xsF7gTthM3ZajNX-upWVTfmo",
