@@ -35,7 +35,7 @@
             overflow: hidden;
             border: 2px solid #38bdf8;
         }
-        /* Advertica Banners ko center karne ke liye styling */
+        /* Safely hiding any text leak from ads */
         .advertica-ad-holder {
             display: flex;
             justify-content: center;
@@ -44,6 +44,8 @@
             width: 100%;
             max-width: 300px;
             overflow: hidden;
+            color: transparent; /* Is se text leak nahi hoga */
+            font-size: 0px;
         }
     </style>
 </head>
@@ -58,7 +60,7 @@
     <div class="container">
         
         <div class="advertica-ad-holder" style="margin-top: 90px;">
-            <ins style="width: 300px; height: 250px" data-width="300" data-height="250" class="d5dcc0e2bf7" data-domain="//data527.click" data-affquery="/16d4f78155ea756f13f2/5dcc" placementName="Earnpro_Banners"><script src="//data527.click/js/responsive.js" async></script></ins>
+            <ins style="display:inline-block;width:300px;height:250px" data-width="300" data-height="250" class="d5dcc0e2bf7" data-domain="//data527.click" data-affquery="/16d4f78155ea756f13f2/5dcc" placementName="Earnpro_Banners"></ins>
         </div>
 
         <div class="Card" style="margin-top: 20px;">
@@ -66,7 +68,7 @@
             <p id="t-count">Tasks: 0/0</p>
             
             <div class="advertica-ad-holder">
-                <ins style="width: 300px; height: 250px" data-width="300" data-height="250" class="d5dcc0e2bf7" data-domain="//data527.click" data-affquery="/16d4f78155ea756f13f2/5dcc" placementName="Earnpro_Banners"><script src="//data527.click/js/responsive.js" async></script></ins>
+                <ins style="display:inline-block;width:300px;height:250px" data-width="300" data-height="250" class="d5dcc0e2bf7" data-domain="//data527.click" data-affquery="/16d4f78155ea756f13f2/5dcc" placementName="Earnpro_Banners"></ins>
             </div>
             
             <div class="video-box" id="v-area">
@@ -83,10 +85,12 @@
         </div>
         
         <div class="advertica-ad-holder">
-            <ins style="width: 300px; height: 250px" data-width="300" data-height="250" class="d5dcc0e2bf7" data-domain="//data527.click" data-affquery="/16d4f78155ea756f13f2/5dcc" placementName="Earnpro_Banners"><script src="//data527.click/js/responsive.js" async></script></ins>
+            <ins style="display:inline-block;width:300px;height:250px" data-width="300" data-height="250" class="d5dcc0e2bf7" data-domain="//data527.click" data-affquery="/16d4f78155ea756f13f2/5dcc" placementName="Earnpro_Banners"></ins>
         </div>
 
     </div>
+
+    <script src="//data527.click/js/responsive.js" async></script>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
