@@ -63,6 +63,20 @@
         const db = getDatabase(app);
         const phone = localStorage.getItem("currentUser");
 
+        // =====================================================================
+        // 🔥 AUTO-FILL AMOUNT ENGINE (Jaise hi Page Load Hoga, Chal Parega)
+        // =====================================================================
+        document.addEventListener("DOMContentLoaded", function() {
+            const selectedAmount = localStorage.getItem("selectedPlanAmount");
+            if (selectedAmount) {
+                let amountField = document.getElementById("depAmount");
+                if (amountField) {
+                    amountField.value = selectedAmount; // Input block me auto pricing set
+                }
+            }
+        });
+        // =====================================================================
+
         window.submitDeposit = function() {
             const amount = document.getElementById("depAmount").value.trim();
             const trx = document.getElementById("depTrx").value.trim();
@@ -95,6 +109,10 @@
                 status: "Pending",
                 time: timestamp
             }).then(() => {
+                // Request submit hone ke baad local storage saaf kar rahe hain taake agli dafa purani amount na show ho
+                localStorage.removeItem("selectedPlanAmount");
+                localStorage.removeItem("selectedPlanName");
+
                 // User ki personal history node mein save karna
                 const userHistoryRef = ref(db, 'history/' + phone + '/' + newDepRef.key);
                 set(userHistoryRef, {
@@ -115,4 +133,4 @@
         }
     </script>
 </body>
-    </html>
+</html>
