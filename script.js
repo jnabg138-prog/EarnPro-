@@ -34,14 +34,14 @@ const db = firebase.database();
 // Application Variables
 let currentBalance = 0;
 let tasksDoneToday = 0;
-let totalLimit = 2;
-let taskReward = 18;
-let taskTime = 120; 
+let totalLimit = 2;       // Default Limit
+let taskReward = 18;      // Default Reward
+let taskTime = 120;       // Default Time
 
 // Login Check Security
 const phone = localStorage.getItem("currentUser");
 if (!phone) {
-    alert("Pehle Login Ofline/Online karein!");
+    alert("Pehle Login Offline/Online karein!");
     window.location.href = "login.html";
 }
 
@@ -55,15 +55,32 @@ userRef.on("value", (snapshot) => {
         tasksDoneToday = parseInt(userData.tasksDone || 0);
         let currentPlan = userData.plan || "Free";
         
-        // Dynamic Plan Selection Logic
+        // =============================================================
+        // 🔥 FIX: ALL PLANS & VIP LIMITS RIGID LOCK SYSTEM
+        // =============================================================
+        // Agar user ka plan string me "VIP" ya koi specific name ho, to yahan se control hoga:
         if (currentPlan === "Free") { totalLimit = 2; taskReward = 18; taskTime = 120; }
         else if (currentPlan === "Basic") { totalLimit = 5; taskReward = 33; taskTime = 100; }
         else if (currentPlan === "Standard") { totalLimit = 10; taskReward = 50; taskTime = 80; }
         else if (currentPlan === "Premium") { totalLimit = 15; taskReward = 70; taskTime = 60; }
         else if (currentPlan === "Ultimate") { totalLimit = 25; taskReward = 100; taskTime = 40; }
         
-        // Updating Frontend Screen Elements
-        if(document.getElementById("p-name")) document.getElementById("p-name").innerText = currentPlan + " Plan";
+        // --- AAPKE VIP PLANS KI SETTINGS ---
+        else if (currentPlan.includes("VIP 1")) { totalLimit = 5; taskReward = 25; taskTime = 90; }
+        else if (currentPlan.includes("VIP 2")) { totalLimit = 7; taskReward = 35; taskTime = 80; }
+        else if (currentPlan.includes("VIP 3")) { totalLimit = 10; taskReward = 45; taskTime = 70; }
+        else if (currentPlan.includes("VIP 4")) { totalLimit = 12; taskReward = 60; taskTime = 60; }
+        else if (currentPlan.includes("VIP 5")) { totalLimit = 15; taskReward = 80; taskTime = 50; }
+        else if (currentPlan.includes("VIP 6")) { totalLimit = 20; taskReward = 100; taskTime = 40; }
+        // VIP 7 Plan ke liye limits yahan lock kar di hain (Aap numbers marzi se badal sakte ho)
+        else if (currentPlan.includes("VIP 7")) { totalLimit = 12; taskReward = 120; taskTime = 30; } 
+        
+        // Fallback agar koi aur naya plan name aa jaye jo ooper nahi hai
+        else { totalLimit = 2; taskReward = 18; taskTime = 120; }
+        // =============================================================
+        
+        // Updating Frontend Screen Elements Live
+        if(document.getElementById("p-name")) document.getElementById("p-name").innerText = currentPlan + (currentPlan.includes("Plan") ? "" : " Plan");
         if(document.getElementById("t-count")) document.getElementById("t-count").innerText = "Tasks: " + tasksDoneToday + "/" + totalLimit;
         
         let vArea = document.getElementById("v-area");
@@ -76,15 +93,16 @@ userRef.on("value", (snapshot) => {
 
 // START TASK CORE ENGINE (With Automatic Monetag Trigger)
 function start() {
+    // 1. Strict limit verification before running the task
     if (tasksDoneToday >= totalLimit) {
         alert("Aapki aaj ki task limit poori ho chuki hai!");
         return;
     }
     
-    // 1. Monetag Ad Trigger: New window popunder
+    // Monetag Ad Trigger: New window popunder
     window.open("https://omg10.com/4/11022523", "_blank");
 
-    // 2. Start Button Hide and Timer Activation
+    // Start Button Hide and Timer Activation
     let sBtn = document.getElementById("s-btn");
     if(sBtn) sBtn.style.display = "none";
     
@@ -105,6 +123,14 @@ function start() {
 
 // SECURE CLAIM REWARD ENGINE
 function claim() {
+    // Double check on client side before adding balance to avoid bypass leaks
+    if (tasksDoneToday >= totalLimit) {
+        alert("Aapki daily task limit cross ho chuki hai!");
+        if(document.getElementById("c-btn")) document.getElementById("c-btn").style.display = "none";
+        if(document.getElementById("s-btn")) document.getElementById("s-btn").style.display = "block";
+        return;
+    }
+
     const newBalance = currentBalance + taskReward;
     const newTasksDone = tasksDoneToday + 1;
     
