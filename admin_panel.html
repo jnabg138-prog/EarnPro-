@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        body {
+            background-color: #0b1329;
+            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
         .admin-table {
             width: 100%;
             border-collapse: collapse;
@@ -14,39 +19,46 @@
             font-size: 13px;
         }
         .admin-table th, .admin-table td {
-            border: 1px solid #334155;
-            padding: 12px 10px;
+            border: 1px solid #1e293b;
+            padding: 14px 12px;
             text-align: left;
         }
         .admin-table th {
-            background-color: #1e293b;
+            background-color: #0f172a;
             color: #38bdf8;
+            font-weight: 600;
         }
         .admin-table tr:nth-child(even) { background-color: #0f172a; }
+        .admin-table tr:nth-child(odd) { background-color: #131e3a; }
+        
         .approve-btn {
-            background: #22c55e; color: #fff; border: none; padding: 5px 10px;
-            border-radius: 5px; cursor: pointer; font-weight: bold;
+            background: #22c55e; color: #fff; border: none; padding: 6px 12px;
+            border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s;
         }
+        .approve-btn:hover { background: #16a34a; }
+        
         .reject-btn {
-            background: #ef4444; color: #fff; border: none; padding: 5px 10px;
-            border-radius: 5px; cursor: pointer; font-weight: bold; margin-left: 5px;
+            background: #ef4444; color: #fff; border: none; padding: 6px 12px;
+            border-radius: 5px; cursor: pointer; font-weight: bold; margin-left: 5px; transition: 0.2s;
         }
+        .reject-btn:hover { background: #dc2626; }
+        
         .status-badge {
-            padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px;
+            padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px;
         }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="logo"><i class="fa-solid fa-lock"></i> EarnPro Control Room</div>
-        <div style="font-size: 12px; color: #deff9a;">Logged in as Admin</div>
+    <nav class="navbar" style="background: #0f172a; border-bottom: 1px solid #1e293b; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div class="logo" style="font-weight: bold; font-size: 18px; color: #38bdf8;"><i class="fa-solid fa-lock"></i> EarnPro Control Room</div>
+        <div style="font-size: 13px; color: #deff9a; background: rgba(222, 255, 154, 0.1); padding: 4px 10px; border-radius: 20px;">Logged in as Admin</div>
     </nav>
 
-    <div class="container" style="padding: 15px; max-width: 100%;">
-        <h2>Pending Deposit Requests</h2>
-        <p style="color: #94a3b8; font-size: 12px;">Verify TIDs and amounts before clicking approve.</p>
+    <div class="container" style="padding: 25px; max-width: 1200px; margin: 0 auto;">
+        <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 5px;">Pending Deposit Requests</h2>
+        <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;">Verify TIDs and amounts before clicking approve. Data syncs live with users.</p>
 
-        <div style="overflow-x: auto;">
+        <div style="overflow-x: auto; background: #0f172a; border-radius: 12px; border: 1px solid #1e293b; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);">
             <table class="admin-table">
                 <thead>
                     <tr>
@@ -59,7 +71,10 @@
                     </tr>
                 </thead>
                 <tbody id="depositRequestsTable">
-                    </tbody>
+                    <tr>
+                        <td colspan='6' style='text-align:center; color:#64748b; padding: 20px;'>Loading database requests...</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -68,6 +83,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getDatabase, ref, onValue, update, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
 
+        // Firebase Configuration (Same as your app configuration)
         const firebaseConfig = {
             apiKey: "AIzaSyAsUq4BEYktF7gTHMB3zaJNX-ugdPVTfoo",
             authDomain: "earnpro-14953.firebaseapp.com",
@@ -81,21 +97,13 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Map amount to proper VIP Plan Name
+        // 🔥 Updated package structural layout matching your 4 New Plans
         function determinePlanName(amount) {
             const amt = parseInt(amount);
-            if (amt === 1500) return "VIP 1";
-            if (amt === 3000) return "VIP 2";
-            if (amt === 5000) return "VIP 3";
-            if (amt === 10000) return "VIP 4";
-            if (amt === 25000) return "VIP 5";
-            if (amt === 50000) return "VIP 6";
-            if (amt === 75000) return "VIP 7";
-            if (amt === 100000) return "VIP 8";
-            if (amt === 150000) return "VIP 9";
-            if (amt === 200000) return "VIP 10";
-            if (amt === 225000) return "VIP 11";
-            if (amt === 250000) return "VIP 12";
+            if (amt === 2000) return "Basic Plan";
+            if (amt === 10000) return "Standard Plan";
+            if (amt === 25000) return "Premium Plan";
+            if (amt === 75000) return "Ultimate Plan";
             return "Free";
         }
 
@@ -103,51 +111,69 @@
         const depositsRef = ref(db, 'deposits');
         onValue(depositsRef, (snapshot) => {
             const tableBody = document.getElementById("depositRequestsTable");
-            tableBody.innerHTML = ""; // Clear existing rows
+            tableBody.innerHTML = ""; // Clear existing table entries
             
             const data = snapshot.val();
             if(!data) {
-                tableBody.innerHTML = "<tr><td colspan='6' style='text-align:center; color:#64748b;'>No deposit requests found!</td></tr>";
+                tableBody.innerHTML = "<tr><td colspan='6' style='text-align:center; color:#64748b; padding: 20px;'>No deposit requests found!</td></tr>";
                 return;
             }
 
-            // Loop through all items
+            let pendingCount = 0;
+
+            // Loop through all items inside 'deposits' node
             Object.keys(data).forEach((key) => {
                 const item = data[key];
                 
-                // Show only Pending or display everything
+                // Show only requests which are strictly "Pending"
                 if(item.status === "Pending") {
+                    pendingCount++;
+                    
+                    // 🔥 KEY RE-FIXING AREA: Matching exactly with deposit.html structure
+                    const userMobile = item.phone || "N/A";
+                    const depositAmount = item.amount || 0;
+                    const transactionId = item.trxId || "N/A";  // Using 'trxId' instead of 'tid'
+                    const dateTime = item.time || "N/A";        // Using 'time' instead of 'date'
+                    
                     const row = document.createElement("tr");
                     row.innerHTML = `
-                        <td><b>${item.user}</b></td>
-                        <td style="color:#22c55e; font-weight:bold;">Rs. ${parseInt(item.amount).toLocaleString()}</td>
-                        <td style="letter-spacing:1px; color:#38bdf8;">${item.tid}</td>
-                        <td style="color:#94a3b8;">${item.date}</td>
+                        <td><b style="color: #e2e8f0;">${userMobile}</b></td>
+                        <td style="color:#22c55e; font-weight:bold; font-size: 14px;">Rs. ${parseInt(depositAmount).toLocaleString()}</td>
+                        <td style="letter-spacing:0.5px; color:#38bdf8; font-weight: 600;">${transactionId}</td>
+                        <td style="color:#94a3b8;">${dateTime}</td>
                         <td><span class="status-badge" style="background:#eab308; color:#000;">${item.status}</span></td>
                         <td>
-                            <button class="approve-btn" onclick="actionDeposit('${key}', '${item.user}', ${item.amount}, 'Approved')">Approve</button>
-                            <button class="reject-btn" onclick="actionDeposit('${key}', '${item.user}', ${item.amount}, 'Rejected')">Reject</button>
+                            <button class="approve-btn" onclick="actionDeposit('${key}', '${userMobile}', ${depositAmount}, 'Approved')">
+                                <i class="fa-solid fa-check"></i> Approve
+                            </button>
+                            <button class="reject-btn" onclick="actionDeposit('${key}', '${userMobile}', ${depositAmount}, 'Rejected')">
+                                <i class="fa-solid fa-xmark"></i> Reject
+                            </button>
                         </td>
                     `;
                     tableBody.appendChild(row);
                 }
             });
 
-            if(tableBody.innerHTML === "") {
-                tableBody.innerHTML = "<tr><td colspan='6' style='text-align:center; color:#64748b;'>All requests are processed!</td></tr>";
+            if(pendingCount === 0) {
+                tableBody.innerHTML = "<tr><td colspan='6' style='text-align:center; color:#64748b; padding: 20px;'>🎉 All requests are processed! No pending data.</td></tr>";
             }
         });
 
-        // Core business logic: Approve or Reject Action
+        // Core business logic: Approve or Reject Action Engine
         window.actionDeposit = function(reqId, userPhone, amount, finalStatus) {
             if(!confirm(`Are you sure you want to mark this request as ${finalStatus}?`)) return;
 
-            // 1. Update the status of the deposit request itself
+            // 1. Update the status of the deposit node item itself
             const specificDepRef = ref(db, 'deposits/' + reqId);
             update(specificDepRef, { status: finalStatus }).then(() => {
                 
+                // Also update user's internal transaction history logs status
+                const historyRef = ref(db, 'history/' + userPhone + '/' + reqId);
+                update(historyRef, { status: finalStatus });
+                
                 if(finalStatus === "Approved") {
-                    // 2. Fetch target user to update balance, plan and handle team bonuses
+                    // 2. Fetch target user profile node to update balance, plan parameters
                     const userRef = ref(db, 'users/' + userPhone);
                     get(userRef).then((userSnapshot) => {
                         if(userSnapshot.exists()) {
@@ -157,41 +183,40 @@
                             let newBalance = currentBalance + parseInt(amount);
                             let matchedPlan = determinePlanName(amount);
 
-                            // Update properties
+                            // Update operational fields inside user object
                             let updates = {};
                             updates['balance'] = newBalance;
                             updates['plan'] = matchedPlan;
+                            updates['tasksDone'] = 0; // Reset task counter back to 0 on new plan activation
 
-                            // 3. Referral Logic: Check if user was referred by a "Boss"
+                            // 3. Referral Commission Logic Engine
                             if(userObj.referredBy && userObj.referredBy !== "NONE" && userObj.referredBy !== "") {
                                 const parentCode = userObj.referredBy;
                                 
-                                // Search all users for matching unique invitation code
                                 const allUsersRef = ref(db, 'users');
                                 get(allUsersRef).then((allSnapshot) => {
                                     if(allSnapshot.exists()) {
                                         const usersList = allSnapshot.val();
                                         Object.keys(usersList).forEach((bossPhone) => {
                                             if(usersList[bossPhone].myCode === parentCode) {
-                                                // Found the referrer! Add +2 tasks permanently
+                                                // Awarding permanent reward tasks boost to the referrer
                                                 let currentBonus = parseInt(usersList[bossPhone].bonusTasks || 0);
                                                 let currentDaily = parseInt(usersList[bossPhone].dailyTasks || 2);
                                                 
                                                 let bossUpdates = {};
                                                 bossUpdates['bonusTasks'] = currentBonus + 2;
-                                                bossUpdates['dailyTasks'] = currentDaily + 2; // Immediate task boost
+                                                bossUpdates['dailyTasks'] = currentDaily + 2;
 
                                                 update(ref(db, 'users/' + bossPhone), bossUpdates);
-                                                console.log("Permanent +2 tasks credited to Boss code: " + parentCode);
                                             }
                                         });
                                     }
                                 });
                             }
 
-                            // Commit updates for the user who deposited
+                            // Commit data modifications back live to target user node
                             update(userRef, updates).then(() => {
-                                alert(`Request Successfully Approved!\nRs. ${amount} added and ${matchedPlan} activated.`);
+                                alert(`Request Successfully Approved!\nRs. ${amount} added to user balance and ${matchedPlan} activated.`);
                             });
                         }
                     });
@@ -199,7 +224,7 @@
                     alert("Request rejected successfully.");
                 }
             }).catch((err) => {
-                alert("Error: " + err.message);
+                alert("Database Sync Error: " + err.message);
             });
         }
     </script>
