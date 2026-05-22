@@ -34,9 +34,9 @@ const db = firebase.database();
 // Application Variables
 let currentBalance = 0;
 let tasksDoneToday = 0;
-let totalLimit = 2;       // Default Limit
-let taskReward = 18;      // Default Reward
-let taskTime = 120;       // Default Time
+let totalLimit = 2;       // Free users tracking fallback limit
+let taskReward = 15;      // Reward fallback per click
+let taskTime = 60;        // Timer delay tracking
 
 // Login Check Security
 const phone = localStorage.getItem("currentUser");
@@ -56,30 +56,41 @@ userRef.on("value", (snapshot) => {
         let currentPlan = userData.plan || "Free";
         
         // =============================================================
-        // 🔥 FIX: ALL PLANS & VIP LIMITS RIGID LOCK SYSTEM
+        // 🔥 NEW RESTRUCTURED 4-PLAN LOCK LOGIC (Strict Limits Matrix)
         // =============================================================
-        // Agar user ka plan string me "VIP" ya koi specific name ho, to yahan se control hoga:
-        if (currentPlan === "Free") { totalLimit = 2; taskReward = 18; taskTime = 120; }
-        else if (currentPlan === "Basic") { totalLimit = 5; taskReward = 33; taskTime = 100; }
-        else if (currentPlan === "Standard") { totalLimit = 10; taskReward = 50; taskTime = 80; }
-        else if (currentPlan === "Premium") { totalLimit = 15; taskReward = 70; taskTime = 60; }
-        else if (currentPlan === "Ultimate") { totalLimit = 25; taskReward = 100; taskTime = 40; }
-        
-        // --- AAPKE VIP PLANS KI SETTINGS ---
-        else if (currentPlan.includes("VIP 1")) { totalLimit = 5; taskReward = 25; taskTime = 90; }
-        else if (currentPlan.includes("VIP 2")) { totalLimit = 7; taskReward = 35; taskTime = 80; }
-        else if (currentPlan.includes("VIP 3")) { totalLimit = 10; taskReward = 45; taskTime = 70; }
-        else if (currentPlan.includes("VIP 4")) { totalLimit = 12; taskReward = 60; taskTime = 60; }
-        else if (currentPlan.includes("VIP 5")) { totalLimit = 15; taskReward = 80; taskTime = 50; }
-        else if (currentPlan.includes("VIP 6")) { totalLimit = 20; taskReward = 100; taskTime = 40; }
-        // VIP 7 Plan ke liye limits yahan lock kar di hain (Aap numbers marzi se badal sakte ho)
-        else if (currentPlan.includes("VIP 7")) { totalLimit = 12; taskReward = 120; taskTime = 30; } 
-        
-        // Fallback agar koi aur naya plan name aa jaye jo ooper nahi hai
-        else { totalLimit = 2; taskReward = 18; taskTime = 120; }
+        if (currentPlan === "Free") { 
+            totalLimit = 2; 
+            taskReward = 15; 
+            taskTime = 60; 
+        }
+        else if (currentPlan.includes("Basic")) { 
+            totalLimit = 10; 
+            taskReward = 15; 
+            taskTime = 30; // 30 seconds timer for optimization
+        }
+        else if (currentPlan.includes("Standard")) { 
+            totalLimit = 45; 
+            taskReward = 19; 
+            taskTime = 20; 
+        }
+        else if (currentPlan.includes("Premium")) { 
+            totalLimit = 110; 
+            taskReward = 20; 
+            taskTime = 15; 
+        }
+        else if (currentPlan.includes("Ultimate")) { 
+            totalLimit = 350; 
+            taskReward = 22; 
+            taskTime = 10; // Superfast timer execution for heavy users
+        }
+        else { 
+            totalLimit = 2; 
+            taskReward = 15; 
+            taskTime = 60; 
+        }
         // =============================================================
         
-        // Updating Frontend Screen Elements Live
+        // Frontend Dynamic Rendering Elements Update Live
         if(document.getElementById("p-name")) document.getElementById("p-name").innerText = currentPlan + (currentPlan.includes("Plan") ? "" : " Plan");
         if(document.getElementById("t-count")) document.getElementById("t-count").innerText = "Tasks: " + tasksDoneToday + "/" + totalLimit;
         
@@ -93,16 +104,16 @@ userRef.on("value", (snapshot) => {
 
 // START TASK CORE ENGINE (With Automatic Monetag Trigger)
 function start() {
-    // 1. Strict limit verification before running the task
+    // Rigid intercept validation to block manipulation hacks
     if (tasksDoneToday >= totalLimit) {
-        alert("Aapki aaj ki task limit poori ho chuki hai!");
+        alert("Aapki aaj ki daily task limit poori ho chuki hai!");
         return;
     }
     
-    // Monetag Ad Trigger: New window popunder
+    // Monetag Ad Trigger Engine
     window.open("https://omg10.com/4/11022523", "_blank");
 
-    // Start Button Hide and Timer Activation
+    // UI Interactive Transition Handling
     let sBtn = document.getElementById("s-btn");
     if(sBtn) sBtn.style.display = "none";
     
@@ -123,9 +134,8 @@ function start() {
 
 // SECURE CLAIM REWARD ENGINE
 function claim() {
-    // Double check on client side before adding balance to avoid bypass leaks
     if (tasksDoneToday >= totalLimit) {
-        alert("Aapki daily task limit cross ho chuki hai!");
+        alert("Daily task limit crossed!");
         if(document.getElementById("c-btn")) document.getElementById("c-btn").style.display = "none";
         if(document.getElementById("s-btn")) document.getElementById("s-btn").style.display = "block";
         return;
@@ -145,4 +155,4 @@ function claim() {
     }).catch((error) => {
         alert("Firebase Sync Error: " + error.message);
     });
-}
+    }
