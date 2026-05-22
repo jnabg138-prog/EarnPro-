@@ -16,7 +16,7 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 // =====================================================================
 
-// Firebase Configuration (Official Object)
+// Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyAxkoq0EY9xsF7gTthM3ZajNX-upWVTfmo",
     authDomain: "earnpro-14953.firebaseapp.com",
@@ -27,23 +27,29 @@ const firebaseConfig = {
     appId: "1:754662452601:web:0548a7ee70ffa1c31f3ad7"
 };
 
-// Initialize Firebase Elements
+// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 // Application Variables
 let currentBalance = 0;
 let tasksDoneToday = 0;
-let totalLimit = 2;       // Free users tracking fallback limit
-let taskReward = 15;      // Reward fallback per click
-let taskTime = 60;        // Timer delay tracking
+let totalLimit = 2;       // Free Plan Limit
+let taskReward = 15;      // Free Plan Reward
+let taskTime = 30;        // Timer seconds
 
-// Login Check Security
+// Login Security Check
 const phone = localStorage.getItem("currentUser");
 if (!phone) {
     alert("Pehle Login Offline/Online karein!");
     window.location.href = "login.html";
 }
+
+// Today's Date Fetcher (Format: YYYY-MM-DD)
+const getTodayDateString = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
 
 // Live Firebase Data Synchronization
 const userRef = db.ref("users/" + phone);
@@ -52,25 +58,38 @@ userRef.on("value", (snapshot) => {
         const userData = snapshot.val();
         
         currentBalance = parseInt(userData.balance || 0);
-        tasksDoneToday = parseInt(userData.tasksDone || 0);
         let currentPlan = userData.plan || "Free";
+        const lastTaskDate = userData.lastTaskDate || "";
+        const todayDate = getTodayDateString();
+
+        // ⏰ AUTO REFRESH LOGIC (Raat 12 Bje Ke Baad Jab Bhi User App Kholega)
+        if (lastTaskDate !== todayDate) {
+            tasksDoneToday = 0;
+            // Database me tasks ko reset aur nai date ko save karna
+            userRef.update({
+                tasksDone: 0,
+                lastTaskDate: todayDate
+            });
+        } else {
+            tasksDoneToday = parseInt(userData.tasksDone || 0);
+        }
         
         // =============================================================
-        // 🔥 NEW RESTRUCTURED 4-PLAN LOCK LOGIC (Strict Limits Matrix)
+        // 🔥 NEW UPDATED TASK LIMITS & REWARDS (BASIC & STANDARD)
         // =============================================================
         if (currentPlan === "Free") { 
             totalLimit = 2; 
             taskReward = 15; 
-            taskTime = 60; 
+            taskTime = 30; 
         }
         else if (currentPlan.includes("Basic")) { 
-            totalLimit = 10; 
-            taskReward = 15; 
-            taskTime = 30; // 30 seconds timer for optimization
+            totalLimit = 5;          // 5 Tasks Daily
+            taskReward = 30;         // Rs. 30 Per Task (Total Rs. 150)
+            taskTime = 25; 
         }
         else if (currentPlan.includes("Standard")) { 
-            totalLimit = 45; 
-            taskReward = 19; 
+            totalLimit = 7;          // 7 Tasks Daily
+            taskReward = 121;        // Rs. 121 Per Task (Total Rs. 847)
             taskTime = 20; 
         }
         else if (currentPlan.includes("Premium")) { 
@@ -81,16 +100,16 @@ userRef.on("value", (snapshot) => {
         else if (currentPlan.includes("Ultimate")) { 
             totalLimit = 350; 
             taskReward = 22; 
-            taskTime = 10; // Superfast timer execution for heavy users
+            taskTime = 10; 
         }
         else { 
             totalLimit = 2; 
             taskReward = 15; 
-            taskTime = 60; 
+            taskTime = 30; 
         }
         // =============================================================
         
-        // Frontend Dynamic Rendering Elements Update Live
+        // Frontend Screen Update Live
         if(document.getElementById("p-name")) document.getElementById("p-name").innerText = currentPlan + (currentPlan.includes("Plan") ? "" : " Plan");
         if(document.getElementById("t-count")) document.getElementById("t-count").innerText = "Tasks: " + tasksDoneToday + "/" + totalLimit;
         
@@ -102,18 +121,15 @@ userRef.on("value", (snapshot) => {
     }
 });
 
-// START TASK CORE ENGINE (With Automatic Monetag Trigger)
+// START TASK ENGINE
 function start() {
-    // Rigid intercept validation to block manipulation hacks
     if (tasksDoneToday >= totalLimit) {
-        alert("Aapki aaj ki daily task limit poori ho chuki hai!");
+        alert("Aapki aaj ki daily task limit poori ho chuki hai! Raat 12 bje ke baad automatic refresh ho jayegi.");
         return;
     }
     
-    // Monetag Ad Trigger Engine
     window.open("https://omg10.com/4/11022523", "_blank");
 
-    // UI Interactive Transition Handling
     let sBtn = document.getElementById("s-btn");
     if(sBtn) sBtn.style.display = "none";
     
@@ -143,10 +159,12 @@ function claim() {
 
     const newBalance = currentBalance + taskReward;
     const newTasksDone = tasksDoneToday + 1;
+    const todayDate = getTodayDateString();
     
     userRef.update({
         balance: newBalance,
-        tasksDone: newTasksDone
+        tasksDone: newTasksDone,
+        lastTaskDate: todayDate // Date save rakhna taake refresh track ho sake
     }).then(() => {
         alert("Mubarak ho! Reward balance mein add ho gaya.");
         if(document.getElementById("c-btn")) document.getElementById("c-btn").style.display = "none";
