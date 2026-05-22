@@ -3,79 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EarnPro - Investment Plans</title>
+    <title>Investment Plans - EarnPro</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #0b1329; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { 
+            background-color: #0b1329; 
+            color: #ffffff; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+        }
+        .plan-card {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            transition: all 0.3s ease;
+        }
+        .plan-card:hover {
+            border-color: #38bdf8;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px -5px rgba(56, 189, 248, 0.2);
+        }
     </style>
 </head>
-<body class="p-4 min-h-screen flex flex-col items-center">
+<body class="p-4 min-h-screen">
 
-    <div class="w-full max-w-md text-center my-6">
-        <h1 class="text-2xl font-bold text-sky-400">Premium Investment Plans</h1>
-        <p class="text-gray-400 text-xs mt-1">Select a plan to maximize your daily earnings</p>
-    </div>
+    <nav class="flex items-center justify-between mb-8">
+        <div onclick="window.location.href='index.html'" class="text-sky-400 cursor-pointer font-bold">
+            <i class="fa-solid fa-arrow-left"></i> Back
+        </div>
+        <h1 class="text-xl font-bold text-white text-center flex-1">Investment Plans</h1>
+        <div class="w-10"></div> </nav>
 
-    <div class="grid grid-cols-2 gap-4 w-full max-w-md pb-12">
-        
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between items-center text-center shadow-lg">
-            <div>
+    <div class="max-w-md mx-auto">
+        <p class="text-gray-400 text-sm text-center mb-8">Choose a plan to start earning daily rewards. Each plan is valid for 1 month.</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
+            
+            <div class="plan-card rounded-2xl p-5 flex flex-col items-center shadow-lg">
+                <div class="bg-emerald-500/10 p-3 rounded-full mb-3">
+                    <i class="fa-solid fa-leaf text-emerald-500 text-2xl"></i>
+                </div>
                 <h2 class="text-lg font-bold text-emerald-400">Basic</h2>
-                <p class="text-xl font-extrabold mt-1">Rs. 2,000</p>
-                <div class="text-[11px] text-gray-400 mt-3 space-y-1">
-                    <p>Daily Ads: <span class="text-white font-semibold">10</span></p>
-                    <p>Daily Earn: <span class="text-white font-semibold">Rs. 150</span></p>
+                <p class="text-2xl font-black mt-1">Rs. 2,000</p>
+                <div class="w-full h-[1px] bg-slate-800 my-4"></div>
+                <div class="text-sm text-gray-300 space-y-2 w-full">
+                    <div class="flex justify-between"><span>Daily Ads:</span><span class="text-white font-bold">5 Ads</span></div>
+                    <div class="flex justify-between"><span>Per Ad:</span><span class="text-white font-bold">Rs. 30</span></div>
+                    <div class="flex justify-between"><span>Daily Earn:</span><span class="text-emerald-400 font-bold">Rs. 150</span></div>
                 </div>
+                <button onclick="buyPlan('Basic', 2000)" class="w-full mt-6 bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-xl transition-all active:scale-95 shadow-lg shadow-sky-900/30">Buy Now</button>
             </div>
-            <button onclick="buyPlan('Basic', 2000)" class="w-full mt-4 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold py-2 rounded-lg transition-all active:scale-95 shadow-md shadow-sky-900/40">Buy Now</button>
-        </div>
 
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between items-center text-center shadow-lg">
-            <div>
+            <div class="plan-card rounded-2xl p-5 flex flex-col items-center shadow-lg">
+                <div class="bg-cyan-500/10 p-3 rounded-full mb-3">
+                    <i class="fa-solid fa-bolt text-cyan-500 text-2xl"></i>
+                </div>
                 <h2 class="text-lg font-bold text-cyan-400">Standard</h2>
-                <p class="text-xl font-extrabold mt-1">Rs. 10,000</p>
-                <div class="text-[11px] text-gray-400 mt-3 space-y-1">
-                    <p>Daily Ads: <span class="text-white font-semibold">45</span></p>
-                    <p>Daily Earn: <span class="text-white font-semibold">Rs. 850</span></p>
+                <p class="text-2xl font-black mt-1">Rs. 10,000</p>
+                <div class="w-full h-[1px] bg-slate-800 my-4"></div>
+                <div class="text-sm text-gray-300 space-y-2 w-full">
+                    <div class="flex justify-between"><span>Daily Ads:</span><span class="text-white font-bold">7 Ads</span></div>
+                    <div class="flex justify-between"><span>Per Ad:</span><span class="text-white font-bold">Rs. 121</span></div>
+                    <div class="flex justify-between"><span>Daily Earn:</span><span class="text-cyan-400 font-bold">Rs. 850</span></div>
                 </div>
+                <button onclick="buyPlan('Standard', 10000)" class="w-full mt-6 bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-xl transition-all active:scale-95 shadow-lg shadow-sky-900/30">Buy Now</button>
             </div>
-            <button onclick="buyPlan('Standard', 10000)" class="w-full mt-4 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold py-2 rounded-lg transition-all active:scale-95 shadow-md shadow-sky-900/40">Buy Now</button>
-        </div>
 
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between items-center text-center shadow-lg">
-            <div>
+            <div class="plan-card rounded-2xl p-5 flex flex-col items-center shadow-lg">
+                <div class="bg-amber-500/10 p-3 rounded-full mb-3">
+                    <i class="fa-solid fa-crown text-amber-500 text-2xl"></i>
+                </div>
                 <h2 class="text-lg font-bold text-amber-400">Premium</h2>
-                <p class="text-xl font-extrabold mt-1">Rs. 25,000</p>
-                <div class="text-[11px] text-gray-400 mt-3 space-y-1">
-                    <p>Daily Ads: <span class="text-white font-semibold">110</span></p>
-                    <p>Daily Earn: <span class="text-white font-semibold">Rs. 2,200</span></p>
+                <p class="text-2xl font-black mt-1">Rs. 25,000</p>
+                <div class="w-full h-[1px] bg-slate-800 my-4"></div>
+                <div class="text-sm text-gray-300 space-y-2 w-full">
+                    <div class="flex justify-between"><span>Daily Ads:</span><span class="text-white font-bold">10 Ads</span></div>
+                    <div class="flex justify-between"><span>Per Ad:</span><span class="text-white font-bold">Rs. 220</span></div>
+                    <div class="flex justify-between"><span>Daily Earn:</span><span class="text-amber-400 font-bold">Rs. 2,200</span></div>
                 </div>
+                <button onclick="buyPlan('Premium', 25000)" class="w-full mt-6 bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-xl transition-all active:scale-95 shadow-lg shadow-sky-900/30">Buy Now</button>
             </div>
-            <button onclick="buyPlan('Premium', 25000)" class="w-full mt-4 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold py-2 rounded-lg transition-all active:scale-95 shadow-md shadow-sky-900/40">Buy Now</button>
-        </div>
 
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between items-center text-center shadow-lg">
-            <div>
+            <div class="plan-card rounded-2xl p-5 flex flex-col items-center shadow-lg">
+                <div class="bg-rose-500/10 p-3 rounded-full mb-3">
+                    <i class="fa-solid fa-gem text-rose-500 text-2xl"></i>
+                </div>
                 <h2 class="text-lg font-bold text-rose-500">Ultimate</h2>
-                <p class="text-xl font-extrabold mt-1">Rs. 75,000</p>
-                <div class="text-[11px] text-gray-400 mt-3 space-y-1">
-                    <p>Daily Ads: <span class="text-white font-semibold">350</span></p>
-                    <p>Daily Earn: <span class="text-white font-semibold">Rs. 7,700</span></p>
+                <p class="text-2xl font-black mt-1">Rs. 75,000</p>
+                <div class="w-full h-[1px] bg-slate-800 my-4"></div>
+                <div class="text-sm text-gray-300 space-y-2 w-full">
+                    <div class="flex justify-between"><span>Daily Ads:</span><span class="text-white font-bold">15 Ads</span></div>
+                    <div class="flex justify-between"><span>Per Ad:</span><span class="text-white font-bold">Rs. 513</span></div>
+                    <div class="flex justify-between"><span>Daily Earn:</span><span class="text-rose-500 font-bold">Rs. 7,700</span></div>
                 </div>
+                <button onclick="buyPlan('Ultimate', 75000)" class="w-full mt-6 bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-xl transition-all active:scale-95 shadow-lg shadow-sky-900/30">Buy Now</button>
             </div>
-            <button onclick="buyPlan('Ultimate', 75000)" class="w-full mt-4 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold py-2 rounded-lg transition-all active:scale-95 shadow-md shadow-sky-900/40">Buy Now</button>
-        </div>
 
+        </div>
     </div>
 
     <script>
-        // Auto-mount processing data transfer to deposit screen
+        // Data transfer function to Deposit Screen
         function buyPlan(planName, amount) {
+            // LocalStorage mein amount aur plan name save karna
             localStorage.setItem("selectedPlanName", planName);
             localStorage.setItem("selectedPlanAmount", amount);
-            // Dynamic redirection to your real deposit page
+            
+            // Redirect to deposit.html
             window.location.href = "deposit.html";
         }
     </script>
 </body>
-</html>
+                    </html>
