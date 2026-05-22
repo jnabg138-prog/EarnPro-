@@ -16,7 +16,7 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 // =====================================================================
 
-// Firebase Configuration
+// Firebase Configuration Object
 const firebaseConfig = {
     apiKey: "AIzaSyAxkoq0EY9xsF7gTthM3ZajNX-upWVTfmo",
     authDomain: "earnpro-14953.firebaseapp.com",
@@ -27,31 +27,31 @@ const firebaseConfig = {
     appId: "1:754662452601:web:0548a7ee70ffa1c31f3ad7"
 };
 
-// Initialize Firebase
+// Initialize Firebase Elements
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 // Application Variables
 let currentBalance = 0;
 let tasksDoneToday = 0;
-let totalLimit = 2;       // Free Plan Limit
-let taskReward = 15;      // Free Plan Reward
-let taskTime = 30;        // Timer seconds
+let totalLimit = 2;       // Free Plan Fallback Limit
+let taskReward = 15;      // Free Plan Fallback Reward
+let taskTime = 30;        // Default Timer seconds
 
-// Login Security Check
+// Login Security Verification
 const phone = localStorage.getItem("currentUser");
 if (!phone) {
     alert("Pehle Login Offline/Online karein!");
     window.location.href = "login.html";
 }
 
-// Today's Date Fetcher (Format: YYYY-MM-DD)
+// Pakistani/Local Date Fetcher (Format: YYYY-MM-DD)
 const getTodayDateString = () => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
 
-// Live Firebase Data Synchronization
+// Live Firebase Data Synchronization Engine
 const userRef = db.ref("users/" + phone);
 userRef.on("value", (snapshot) => {
     if (snapshot.exists()) {
@@ -62,10 +62,10 @@ userRef.on("value", (snapshot) => {
         const lastTaskDate = userData.lastTaskDate || "";
         const todayDate = getTodayDateString();
 
-        // ⏰ AUTO REFRESH LOGIC (Raat 12 Bje Ke Baad Jab Bhi User App Kholega)
+        // ⏰ 12:00 AM MIDNIGHT AUTO-REFRESH LOGIC
         if (lastTaskDate !== todayDate) {
             tasksDoneToday = 0;
-            // Database me tasks ko reset aur nai date ko save karna
+            // Database mein automatic counter refresh aur nai date lock karna
             userRef.update({
                 tasksDone: 0,
                 lastTaskDate: todayDate
@@ -75,7 +75,7 @@ userRef.on("value", (snapshot) => {
         }
         
         // =============================================================
-        // 🔥 NEW UPDATED TASK LIMITS & REWARDS (BASIC & STANDARD)
+        // 🔥 ALL 4 INVESTMENT PLANS FIXED STRUCTURAL MATRIX
         // =============================================================
         if (currentPlan === "Free") { 
             totalLimit = 2; 
@@ -93,14 +93,14 @@ userRef.on("value", (snapshot) => {
             taskTime = 20; 
         }
         else if (currentPlan.includes("Premium")) { 
-            totalLimit = 110; 
-            taskReward = 20; 
-            taskTime = 15; 
+            totalLimit = 10;         // 10 Tasks Daily
+            taskReward = 220;        // Rs. 220 Per Task (Total Rs. 2200)
+            taskTime = 15;           
         }
         else if (currentPlan.includes("Ultimate")) { 
-            totalLimit = 350; 
-            taskReward = 22; 
-            taskTime = 10; 
+            totalLimit = 15;         // 15 Tasks Daily
+            taskReward = 513;        // Rs. 513 Per Task (Total Rs. 7695)
+            taskTime = 10;           
         }
         else { 
             totalLimit = 2; 
@@ -109,27 +109,31 @@ userRef.on("value", (snapshot) => {
         }
         // =============================================================
         
-        // Frontend Screen Update Live
+        // Updating Frontend Screen Elements Live
         if(document.getElementById("p-name")) document.getElementById("p-name").innerText = currentPlan + (currentPlan.includes("Plan") ? "" : " Plan");
         if(document.getElementById("t-count")) document.getElementById("t-count").innerText = "Tasks: " + tasksDoneToday + "/" + totalLimit;
         
+        // 🔥 FIXED VIDEO INJECTION: Is embed link mein aapki requested video ka ID set kar diya hai
         let vArea = document.getElementById("v-area");
         if (vArea) {
             vArea.innerHTML = `<p id="r-text" style="color: #38bdf8; font-size: 14px; font-weight: bold; margin-bottom: 10px;">Reward: Rs. ${taskReward}</p>
-            <iframe src="https://www.youtube.com/embed/ScWrIexB5i4"></iframe>`;
+            <iframe src="https://www.youtube.com/embed/FOlcoz_3TPY"></iframe>`;
         }
     }
 });
 
-// START TASK ENGINE
+// START TASK CORE ENGINE (With Monetag Popunder Integration)
 function start() {
+    // Intercept check to completely block limit bypass attempts
     if (tasksDoneToday >= totalLimit) {
         alert("Aapki aaj ki daily task limit poori ho chuki hai! Raat 12 bje ke baad automatic refresh ho jayegi.");
         return;
     }
     
+    // Ads Activation Trigger
     window.open("https://omg10.com/4/11022523", "_blank");
 
+    // UI State Management (Hide Start, Show Countdowns)
     let sBtn = document.getElementById("s-btn");
     if(sBtn) sBtn.style.display = "none";
     
@@ -161,10 +165,11 @@ function claim() {
     const newTasksDone = tasksDoneToday + 1;
     const todayDate = getTodayDateString();
     
+    // Synchronizing finalized parameters directly to Firebase
     userRef.update({
         balance: newBalance,
         tasksDone: newTasksDone,
-        lastTaskDate: todayDate // Date save rakhna taake refresh track ho sake
+        lastTaskDate: todayDate
     }).then(() => {
         alert("Mubarak ho! Reward balance mein add ho gaya.");
         if(document.getElementById("c-btn")) document.getElementById("c-btn").style.display = "none";
@@ -173,4 +178,4 @@ function claim() {
     }).catch((error) => {
         alert("Firebase Sync Error: " + error.message);
     });
-    }
+            }
