@@ -6,40 +6,104 @@
     <title>Deposit - EarnPro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* =====================================================================
+           🔥 PREMIUM PROFESSIONAL INPUT FIELD & UI OVERWRITE STYLING
+           ===================================================================== */
+        body {
+            background-color: #0b1329;
+            color: #ffffff;
+        }
+        
+        /* Modernized Form Layout & Spacing */
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            color: #38bdf8;
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* STRICT WHITE TEXT INPUT BOXES RULE */
+        .modern-input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 15px;
+            color: #ffffff !important;                /* Hardcoded Pure White Input Text */
+            background-color: #1e293b !important;     /* Slate Dark Box Tint */
+            border: 2px solid #334155 !important;     /* Defined Border */
+            border-radius: 8px !important;
+            outline: none;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        /* Focus Glow State */
+        .modern-input:focus {
+            color: #ffffff !important;
+            border-color: #38bdf8 !important;         /* Interactive Sky-Blue Indicator */
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+            background-color: #1e293b !important;
+        }
+
+        /* Universal Placeholder Text Color Fix */
+        .modern-input::placeholder {
+            color: #64748b !important;                 /* Readable Light Slate Gray */
+            opacity: 1;
+        }
+
+        /* Chrome/Safari input optimization */
+        .modern-input:-webkit-autofill,
+        .modern-input:-webkit-autofill:hover, 
+        .modern-input:-webkit-autofill:focus {
+            -webkit-text-fill-color: #ffffff !important;
+            box-shadow: 0 0 0px 1000px #1e293b inset !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo" onclick="window.location.href='index.html'">← Back</div>
+        <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">← Back</div>
         <div class="logo">Deposit Money</div>
         <div></div>
     </nav>
 
     <div class="container" style="margin-top: 80px; padding: 20px;">
         <div style="text-align: right; margin-bottom: 15px;">
-            <button onclick="window.location.href='history.html'" style="background: transparent; border: 1px solid #38bdf8; color: #38bdf8; padding: 6px 14px; font-size: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s;">
+            <button onclick="window.location.href='history.html'" style="background: transparent; border: 1px solid #38bdf8; color: #38bdf8; padding: 7px 16px; font-size: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s;">
                 <i class="fa-solid fa-clock-history"></i> Deposit Record
             </button>
         </div>
 
-        <div class="card" style="text-align: center; padding: 20px;">
-            <i class="fa-solid fa-wallet" style="font-size: 40px; color: #38bdf8; margin-bottom: 15px;"></i>
-            <h2>Send Payment</h2>
-            <p style="font-size: 13px; color: #94a3b8; margin-bottom: 20px;">Niche diye gaye account par paise send karke details submit karein.</p>
+        <div class="card" style="text-align: center; padding: 25px 20px; border-radius: 12px; background: #0f172a; border: 1px solid #1e293b; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);">
+            <i class="fa-solid fa-wallet" style="font-size: 44px; color: #38bdf8; margin-bottom: 15px;"></i>
+            <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 5px;">Send Payment</h2>
+            <p style="font-size: 13px; color: #94a3b8; margin-bottom: 25px; line-height: 1.5;">Niche diye gaye account par paise send karke details submit karein.</p>
 
-            <div style="background: #1e293b; padding: 15px; border-radius: 10px; text-align: left; margin-bottom: 20px; border: 1px dashed #334155;">
-                <p style="margin: 5px 0; font-size: 14px;"><strong>Bank Name:</strong> JazzCash</p>
-                <p style="margin: 5px 0; font-size: 14px;"><strong>Account No:</strong> 03414166600</p>
-                <p style="margin: 5px 0; font-size: 14px;"><strong>Account Title:</strong> Ghulam Shabir</p>
+            <div style="background: #1e293b; padding: 15px; border-radius: 10px; text-align: left; margin-bottom: 25px; border: 1px dashed #334155;">
+                <p style="margin: 6px 0; font-size: 14px; color: #e2e8f0;"><strong style="color: #38bdf8;">Bank Name:</strong> JazzCash</p>
+                <p style="margin: 6px 0; font-size: 14px; color: #e2e8f0;"><strong style="color: #38bdf8;">Account No:</strong> 03414166600</p>
+                <p style="margin: 6px 0; font-size: 14px; color: #e2e8f0;"><strong style="color: #38bdf8;">Account Title:</strong> Ghulam Shabir</p>
             </div>
 
-            <div style="text-align: left;">
-                <label style="font-size: 12px; color: #e2e8f0; margin-left: 5px;">Amount (PKR)</label>
-                <input type="number" id="depAmount" placeholder="Enter amount (e.g. 1500, 10,000)">
-                <label style="font-size: 12px; color: #e2e8f0; margin-left: 5px;">Transaction ID (TrxID)</label>
-                <input type="text" id="depTrx" placeholder="Enter 11-digit Transaction ID">
+            <div class="input-group">
+                <label for="depAmount"><i class="fa-solid fa-money-bill-wave" style="margin-right: 5px;"></i> Amount (PKR)</label>
+                <input type="number" id="depAmount" class="modern-input" placeholder="Enter amount (e.g. 2000, 10000)">
             </div>
 
-            <button id="depBtn" onclick="submitDeposit()" style="margin-top: 20px; background: #38bdf8; color: #0f172a; font-weight: bold; width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer;">
+            <div class="input-group" style="margin-bottom: 25px;">
+                <label for="depTrx"><i class="fa-solid fa-receipt" style="margin-right: 5px;"></i> Transaction ID (TrxID)</label>
+                <input type="text" id="depTrx" class="modern-input" placeholder="Enter 11-digit Transaction ID">
+            </div>
+
+            <button id="depBtn" onclick="submitDeposit()" style="background: #38bdf8; color: #0f172a; font-weight: 800; width: 100%; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);">
                 Submit Request
             </button>
         </div>
@@ -63,19 +127,16 @@
         const db = getDatabase(app);
         const phone = localStorage.getItem("currentUser");
 
-        // =====================================================================
-        // 🔥 AUTO-FILL AMOUNT ENGINE (Jaise hi Page Load Hoga, Chal Parega)
-        // =====================================================================
+        // Dynamic localstorage value retrieval setup
         document.addEventListener("DOMContentLoaded", function() {
             const selectedAmount = localStorage.getItem("selectedPlanAmount");
             if (selectedAmount) {
                 let amountField = document.getElementById("depAmount");
                 if (amountField) {
-                    amountField.value = selectedAmount; // Input block me auto pricing set
+                    amountField.value = selectedAmount;
                 }
             }
         });
-        // =====================================================================
 
         window.submitDeposit = function() {
             const amount = document.getElementById("depAmount").value.trim();
@@ -96,7 +157,6 @@
             btn.disabled = true;
             btn.innerHTML = "Submitting...";
 
-            // Deposits requests node for admin panel
             const depRef = ref(db, 'deposits');
             const newDepRef = push(depRef);
             
@@ -109,11 +169,9 @@
                 status: "Pending",
                 time: timestamp
             }).then(() => {
-                // Request submit hone ke baad local storage saaf kar rahe hain taake agli dafa purani amount na show ho
                 localStorage.removeItem("selectedPlanAmount");
                 localStorage.removeItem("selectedPlanName");
 
-                // User ki personal history node mein save karna
                 const userHistoryRef = ref(db, 'history/' + phone + '/' + newDepRef.key);
                 set(userHistoryRef, {
                     type: "Deposit",
@@ -123,7 +181,7 @@
                     time: timestamp
                 }).then(() => {
                     alert("Deposit request submit ho gayi hai! Admin 30 minutes mein check karke plan active kar dega.");
-                    window.location.href = 'history.html'; // Request ke baad automatic history page par redirection
+                    window.location.href = 'history.html';
                 });
             }).catch((err) => {
                 alert("Error: " + err.message);
