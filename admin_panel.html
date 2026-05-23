@@ -3,78 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - EarnPro</title>
-    <link rel="stylesheet" href="style.css">
+    <title>EarnPro Super Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body {
-            background-color: #0b1329;
-            color: #ffffff;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-        }
-        .admin-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 13px;
-        }
-        .admin-table th, .admin-table td {
-            border: 1px solid #1e293b;
-            padding: 14px 12px;
-            text-align: left;
-        }
-        .admin-table th {
-            background-color: #0f172a;
-            color: #38bdf8;
-            font-weight: 600;
-        }
-        .admin-table tr:nth-child(even) { background-color: #0f172a; }
-        .admin-table tr:nth-child(odd) { background-color: #131e3a; }
+        :root { --bg: #0b1329; --card: #0f172a; --border: #1e293b; --text: #f8fafc; --primary: #38bdf8; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); }
         
-        .approve-btn {
-            background: #22c55e; color: #fff; border: none; padding: 6px 12px;
-            border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s;
-        }
-        .approve-btn:hover { background: #16a34a; }
+        /* Login Overlay */
+        #adminAuth { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .auth-card { background: var(--card); padding: 40px; border-radius: 15px; border: 1px solid var(--border); width: 100%; max-width: 400px; text-align: center; }
         
-        .reject-btn {
-            background: #ef4444; color: #fff; border: none; padding: 6px 12px;
-            border-radius: 5px; cursor: pointer; font-weight: bold; margin-left: 5px; transition: 0.2s;
-        }
-        .reject-btn:hover { background: #dc2626; }
+        /* Main Dashboard */
+        .dashboard { display: none; padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
         
-        .status-badge {
-            padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px;
-        }
+        /* Search & Stats Section */
+        .search-box { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); display: flex; gap: 10px; margin-bottom: 30px; }
+        input, select { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: #0b1329; color: white; outline: none; }
+        .btn { padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: #0f172a; }
+        
+        /* User Edit Panel */
+        .edit-panel { background: var(--card); border: 1px solid var(--primary); border-radius: 12px; padding: 25px; margin-bottom: 30px; display: none; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 15px 0; }
+        
+        .table-container { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--primary); background: rgba(56, 189, 248, 0.05); }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <nav class="navbar" style="background: #0f172a; border-bottom: 1px solid #1e293b; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
-        <div class="logo" style="font-weight: bold; font-size: 18px; color: #38bdf8;"><i class="fa-solid fa-lock"></i> EarnPro Control Room</div>
-        <div style="font-size: 13px; color: #deff9a; background: rgba(222, 255, 154, 0.1); padding: 4px 10px; border-radius: 20px;">Logged in as Admin</div>
-    </nav>
 
-    <div class="container" style="padding: 25px; max-width: 1200px; margin: 0 auto;">
-        <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 5px;">Pending Deposit Requests</h2>
-        <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;">Verify TIDs and amounts before clicking approve. Data syncs live with users.</p>
+    <!-- 1. Admin Login Shield -->
+    <div id="adminAuth">
+        <div class="auth-card">
+            <i class="fa-solid fa-shield-halved" style="font-size: 50px; color: var(--primary); margin-bottom: 20px;"></i>
+            <h2>Admin Access</h2>
+            <p style="color: #94a3b8; font-size: 14px; margin: 10px 0 20px;">Enter security key to manage EarnPro</p>
+            <input type="password" id="adminPass" placeholder="Enter Admin Password..." style="width: 100%; margin-bottom: 15px;">
+            <button onclick="checkAdmin()" class="btn btn-primary" style="width: 100%;">Unlock Dashboard</button>
+        </div>
+    </div>
 
-        <div style="overflow-x: auto; background: #0f172a; border-radius: 12px; border: 1px solid #1e293b; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);">
-            <table class="admin-table">
+    <!-- 2. Main Dashboard Content -->
+    <div class="dashboard" id="mainDashboard">
+        <div class="nav">
+            <h2><i class="fa-solid fa-gauge-high"></i> EarnPro Super Admin</h2>
+            <button onclick="location.reload()" class="btn" style="background: #ef4444; color: white;">Logout</button>
+        </div>
+
+        <!-- Global Search Bar (Phone ya TID search karein) -->
+        <div class="search-box">
+            <input type="text" id="globalSearch" placeholder="Search by User Phone or Transaction ID (TID)...">
+            <button onclick="searchEverything()" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+        </div>
+
+        <!-- Hidden User Edit Panel (Search ke baad khulega) -->
+        <div id="userEditPanel" class="edit-panel">
+            <h3 id="editTitle">Edit User: Loading...</h3>
+            <div class="grid">
+                <div><label>Balance (Rs.)</label><input type="number" id="upBalance"></div>
+                <div><label>Daily Tasks</label><input type="number" id="upTasks"></div>
+                <div>
+                    <label>Account Plan</label>
+                    <select id="upPlan">
+                        <option value="Free">Free</option>
+                        <option value="Basic Plan">Basic Plan</option>
+                        <option value="Standard Plan">Standard Plan</option>
+                        <option value="Premium Plan">Premium Plan</option>
+                        <option value="Ultimate Plan">Ultimate Plan</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="commitUserUpdate()" class="btn btn-primary" style="width: 100%;"><i class="fa-solid fa-save"></i> Save All Changes</button>
+        </div>
+
+        <!-- Pending Deposits Table -->
+        <h3><i class="fa-solid fa-clock-rotate-left"></i> Pending Deposit Requests</h3>
+        <div class="table-container">
+            <table>
                 <thead>
                     <tr>
-                        <th>User Mobile</th>
+                        <th>User</th>
                         <th>Amount</th>
-                        <th>TID (Transaction ID)</th>
-                        <th>Date & Time</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th>TID</th>
+                        <th>Time</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
-                <tbody id="depositRequestsTable">
-                    <tr>
-                        <td colspan='6' style='text-align:center; color:#64748b; padding: 20px;'>Loading database requests...</td>
-                    </tr>
-                </tbody>
+                <tbody id="depositTable"></tbody>
             </table>
         </div>
     </div>
@@ -83,7 +103,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getDatabase, ref, onValue, update, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
 
-        // Firebase Configuration (Same as your app configuration)
         const firebaseConfig = {
             apiKey: "AIzaSyAsUq4BEYktF7gTHMB3zaJNX-ugdPVTfoo",
             authDomain: "earnpro-14953.firebaseapp.com",
@@ -97,136 +116,105 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // 🔥 Updated package structural layout matching your 4 New Plans
-        function determinePlanName(amount) {
-            const amt = parseInt(amount);
-            if (amt === 2000) return "Basic Plan";
-            if (amt === 10000) return "Standard Plan";
-            if (amt === 25000) return "Premium Plan";
-            if (amt === 75000) return "Ultimate Plan";
-            return "Free";
+        // --- 1. Login Logic ---
+        window.checkAdmin = function() {
+            const pass = document.getElementById("adminPass").value;
+            if(pass === "786786") { // Apna password yahan set karein
+                document.getElementById("adminAuth").style.display = "none";
+                document.getElementById("mainDashboard").style.display = "block";
+                loadPendingDeposits();
+            } else {
+                alert("Wrong Admin Password!");
+            }
         }
 
-        // Live fetch deposit data from Firebase
-        const depositsRef = ref(db, 'deposits');
-        onValue(depositsRef, (snapshot) => {
-            const tableBody = document.getElementById("depositRequestsTable");
-            tableBody.innerHTML = ""; // Clear existing table entries
-            
-            const data = snapshot.val();
-            if(!data) {
-                tableBody.innerHTML = "<tr><td colspan='6' style='text-align:center; color:#64748b; padding: 20px;'>No deposit requests found!</td></tr>";
-                return;
-            }
+        // --- 2. Live Pending Deposits ---
+        function loadPendingDeposits() {
+            onValue(ref(db, 'deposits'), (snapshot) => {
+                const tbody = document.getElementById("depositTable");
+                tbody.innerHTML = "";
+                const data = snapshot.val();
+                if(!data) return;
 
-            let pendingCount = 0;
-
-            // Loop through all items inside 'deposits' node
-            Object.keys(data).forEach((key) => {
-                const item = data[key];
-                
-                // Show only requests which are strictly "Pending"
-                if(item.status === "Pending") {
-                    pendingCount++;
-                    
-                    // 🔥 KEY RE-FIXING AREA: Matching exactly with deposit.html structure
-                    const userMobile = item.phone || "N/A";
-                    const depositAmount = item.amount || 0;
-                    const transactionId = item.trxId || "N/A";  // Using 'trxId' instead of 'tid'
-                    const dateTime = item.time || "N/A";        // Using 'time' instead of 'date'
-                    
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td><b style="color: #e2e8f0;">${userMobile}</b></td>
-                        <td style="color:#22c55e; font-weight:bold; font-size: 14px;">Rs. ${parseInt(depositAmount).toLocaleString()}</td>
-                        <td style="letter-spacing:0.5px; color:#38bdf8; font-weight: 600;">${transactionId}</td>
-                        <td style="color:#94a3b8;">${dateTime}</td>
-                        <td><span class="status-badge" style="background:#eab308; color:#000;">${item.status}</span></td>
-                        <td>
-                            <button class="approve-btn" onclick="actionDeposit('${key}', '${userMobile}', ${depositAmount}, 'Approved')">
-                                <i class="fa-solid fa-check"></i> Approve
-                            </button>
-                            <button class="reject-btn" onclick="actionDeposit('${key}', '${userMobile}', ${depositAmount}, 'Rejected')">
-                                <i class="fa-solid fa-xmark"></i> Reject
-                            </button>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
-                }
+                Object.keys(data).forEach(key => {
+                    const item = data[key];
+                    if(item.status === "Pending") {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td><b>${item.phone}</b></td>
+                                <td style="color:#22c55e;">Rs. ${item.amount}</td>
+                                <td style="color:#38bdf8;">${item.trxId}</td>
+                                <td>${item.time}</td>
+                                <td>
+                                    <button class="btn btn-primary" style="padding:5px 10px;" onclick="approveDep('${key}', '${item.phone}', ${item.amount})">Approve</button>
+                                </td>
+                            </tr>`;
+                    }
+                });
             });
+        }
 
-            if(pendingCount === 0) {
-                tableBody.innerHTML = "<tr><td colspan='6' style='text-align:center; color:#64748b; padding: 20px;'>🎉 All requests are processed! No pending data.</td></tr>";
-            }
-        });
+        // --- 3. Powerful Global Search (Phone or TID) ---
+        window.searchEverything = function() {
+            const query = document.getElementById("globalSearch").value.trim();
+            if(!query) return alert("Kuch likhen search karne ke liye!");
 
-        // Core business logic: Approve or Reject Action Engine
-        window.actionDeposit = function(reqId, userPhone, amount, finalStatus) {
-            if(!confirm(`Are you sure you want to mark this request as ${finalStatus}?`)) return;
+            // Pehle check karein agar ye Phone Number hai
+            get(ref(db, 'users/' + query)).then((snap) => {
+                if(snap.exists()) {
+                    showEditPanel(query, snap.val());
+                } else {
+                    // Agar phone nahi mila, to Deposits mein TID search karein
+                    get(ref(db, 'deposits')).then((depSnap) => {
+                        let foundPhone = null;
+                        const deposits = depSnap.val();
+                        Object.values(deposits).forEach(d => {
+                            if(d.trxId === query) foundPhone = d.phone;
+                        });
 
-            // 1. Update the status of the deposit node item itself
-            const specificDepRef = ref(db, 'deposits/' + reqId);
-            update(specificDepRef, { status: finalStatus }).then(() => {
-                
-                // Also update user's internal transaction history logs status
-                const historyRef = ref(db, 'history/' + userPhone + '/' + reqId);
-                update(historyRef, { status: finalStatus });
-                
-                if(finalStatus === "Approved") {
-                    // 2. Fetch target user profile node to update balance, plan parameters
-                    const userRef = ref(db, 'users/' + userPhone);
-                    get(userRef).then((userSnapshot) => {
-                        if(userSnapshot.exists()) {
-                            const userObj = userSnapshot.val();
-                            
-                            let currentBalance = parseInt(userObj.balance || 0);
-                            let newBalance = currentBalance + parseInt(amount);
-                            let matchedPlan = determinePlanName(amount);
-
-                            // Update operational fields inside user object
-                            let updates = {};
-                            updates['balance'] = newBalance;
-                            updates['plan'] = matchedPlan;
-                            updates['tasksDone'] = 0; // Reset task counter back to 0 on new plan activation
-
-                            // 3. Referral Commission Logic Engine
-                            if(userObj.referredBy && userObj.referredBy !== "NONE" && userObj.referredBy !== "") {
-                                const parentCode = userObj.referredBy;
-                                
-                                const allUsersRef = ref(db, 'users');
-                                get(allUsersRef).then((allSnapshot) => {
-                                    if(allSnapshot.exists()) {
-                                        const usersList = allSnapshot.val();
-                                        Object.keys(usersList).forEach((bossPhone) => {
-                                            if(usersList[bossPhone].myCode === parentCode) {
-                                                // Awarding permanent reward tasks boost to the referrer
-                                                let currentBonus = parseInt(usersList[bossPhone].bonusTasks || 0);
-                                                let currentDaily = parseInt(usersList[bossPhone].dailyTasks || 2);
-                                                
-                                                let bossUpdates = {};
-                                                bossUpdates['bonusTasks'] = currentBonus + 2;
-                                                bossUpdates['dailyTasks'] = currentDaily + 2;
-
-                                                update(ref(db, 'users/' + bossPhone), bossUpdates);
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-
-                            // Commit data modifications back live to target user node
-                            update(userRef, updates).then(() => {
-                                alert(`Request Successfully Approved!\nRs. ${amount} added to user balance and ${matchedPlan} activated.`);
-                            });
+                        if(foundPhone) {
+                            get(ref(db, 'users/' + foundPhone)).then(s => showEditPanel(foundPhone, s.val()));
+                        } else {
+                            alert("No user or TID found!");
                         }
                     });
-                } else {
-                    alert("Request rejected successfully.");
                 }
-            }).catch((err) => {
-                alert("Database Sync Error: " + err.message);
+            });
+        }
+
+        function showEditPanel(phone, data) {
+            document.getElementById("userEditPanel").style.display = "block";
+            document.getElementById("editTitle").innerText = "Editing User: " + phone;
+            document.getElementById("upBalance").value = data.balance || 0;
+            document.getElementById("upTasks").value = data.dailyTasks || 2;
+            document.getElementById("upPlan").value = data.plan || "Free";
+            // Save phone globally to use in update
+            window.activeEditPhone = phone;
+            window.scrollTo(0,0);
+        }
+
+        window.commitUserUpdate = function() {
+            const phone = window.activeEditPhone;
+            const updates = {
+                balance: parseInt(document.getElementById("upBalance").value),
+                dailyTasks: parseInt(document.getElementById("upTasks").value),
+                plan: document.getElementById("upPlan").value
+            };
+            update(ref(db, 'users/' + phone), updates).then(() => {
+                alert("User updated successfully!");
+                document.getElementById("userEditPanel").style.display = "none";
+            });
+        }
+
+        window.approveDep = function(id, phone, amt) {
+            if(!confirm("Approve this payment?")) return;
+            update(ref(db, 'deposits/' + id), { status: "Approved" });
+            get(ref(db, 'users/' + phone)).then(s => {
+                const cur = s.val().balance || 0;
+                update(ref(db, 'users/' + phone), { balance: cur + parseInt(amt) });
+                alert("Payment Approved & Balance Added!");
             });
         }
     </script>
 </body>
-</html>
+                                                        </html>
