@@ -6,29 +6,33 @@
     <title>Refer & Earn - EarnPro</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
-        body { background: #0d1117; color: #c9d1d9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 30px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
-        h2 { color: #58a6ff; margin-bottom: 25px; font-size: 24px; }
-        .code-box { background: #0d1117; border: 2px dashed #30363d; border-radius: 8px; padding: 20px; margin-bottom: 25px; }
-        .code-box p { font-size: 12px; color: #8b949e; letter-spacing: 1px; margin-bottom: 10px; }
-        .code-box h1 { font-size: 32px; color: #38bdf8; letter-spacing: 2px; margin-bottom: 15px; }
-        .btn { background: #38bdf8; color: #0f172a; border: none; padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; transition: 0.2s; }
-        .btn:hover { background: #0ea5e9; }
+        body { background: #0b1329; color: #c9d1d9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 30px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        h2 { color: #38bdf8; margin-bottom: 25px; font-size: 24px; font-weight: 700; }
+        .code-box { background: #0b1329; border: 2px dashed #334155; border-radius: 8px; padding: 20px; margin-bottom: 25px; transition: 0.3s; }
+        .code-box:hover { border-color: #38bdf8; }
+        .code-box p { font-size: 11px; color: #94a3b8; letter-spacing: 1.5px; margin-bottom: 10px; }
+        .code-box h1 { font-size: 32px; color: #ffffff; letter-spacing: 2px; margin-bottom: 15px; }
+        .btn { background: #38bdf8; color: #0f172a; border: none; padding: 14px 24px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.2s; box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2); }
+        .btn:hover { background: #0ea5e9; transform: translateY(-2px); }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .stat-card { background: #21262d; border: 1px solid #30363d; padding: 15px; border-radius: 8px; }
-        .stat-card h3 { font-size: 24px; color: #38bdf8; margin-bottom: 5px; }
-        .stat-card p { font-size: 12px; color: #8b949e; }
+        .stat-card { background: #1e293b; border: 1px solid #334155; padding: 15px; border-radius: 10px; }
+        .stat-card h3 { font-size: 24px; color: #38bdf8; margin-bottom: 5px; font-weight: 800; }
+        .stat-card p { font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+        .back-link { display: block; margin-top: 20px; color: #94a3b8; text-decoration: none; font-size: 14px; transition: 0.2s; }
+        .back-link:hover { color: #38bdf8; }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <a href="index.html" class="back-link" style="text-align: left; margin-bottom: 10px; display: inline-block; width: 100%;"><i class="fa-solid fa-arrow-left"></i> ← Back to Dashboard</a>
         <h2>Refer & Earn</h2>
         
         <div class="code-box">
-            <p>YOUR UNIQUE CODE</p>
-            <h1 id="myUniqueCode">Generating...</h1>
-            <button onclick="copyRef()" class="btn">🔗 Copy Link</button>
+            <p>YOUR UNIQUE REFERRAL CODE</p>
+            <h1 id="myUniqueCode">EP-LOADING</h1>
+            <button onclick="copyRef()" class="btn">🔗 Copy Referral Link</button>
         </div>
 
         <div class="stats-grid">
@@ -38,45 +42,64 @@
             </div>
             <div class="stat-card">
                 <h3 id="permBonus">0</h3>
-                <p>Permanent Tasks</p>
+                <p>Bonus Tasks</p>
             </div>
         </div>
     </div>
 
+    <!-- Firebase SDKs (Using Version 8 for Compatibility) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="script.js"></script>
     
     <script>
-        // LocalStorage se login phone ਨੰਬਰ nikalna
+        // 1. Firebase Configuration (Apne Dashboard se match karein)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAsUq4BEYktF7gTHMB3zaJNX-ugdPVTfoo",
+            authDomain: "earnpro-14953.firebaseapp.com",
+            databaseURL: "https://earnpro-14953-default-rtdb.firebaseio.com",
+            projectId: "earnpro-14953",
+            storageBucket: "earnpro-14953.firebasestorage.app",
+            messagingSenderId: "754662452601",
+            appId: "1:754662452601:web:0548a7ee79ffafc63f13a8"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
+
+        // 2. User Authentication Check
         const phone = localStorage.getItem("currentUser");
 
         if (!phone) {
-            alert("Pehle login karein!");
+            alert("Sashan expire ho gaya! Pehle login karein.");
             window.location.href = "login.html";
         } else {
-            // INSTANT CODE GENERATION (Bina database ka wait kiye)
-            // Phone number ke aakhri 6 numbers uthana
-            const lastSixDigits = phone.slice(-6); 
+            // Instant Code Generation: Phone ke aakhri 6 digit se code banana
+            const lastSixDigits = phone.toString().slice(-6); 
             const myInstantCode = "EP-" + lastSixDigits;
             
-            // Screen par foran dikha do
+            // Screen par foran display karein
             document.getElementById("myUniqueCode").innerText = myInstantCode;
 
-            // Background mein database se baki data (Invites/Bonus) load hota rahega, screen nahi rukegi
-            const userRef = firebase.database().ref("users/" + phone);
+            // Database Sync
+            const userRef = db.ref("users/" + phone);
+            
+            // Stats aur Bonus check karne ke liye listener
             userRef.on("value", (snapshot) => {
                 const user = snapshot.val();
                 if (user) {
+                    // Permanent bonus tasks dikhana
                     document.getElementById("permBonus").innerText = user.bonusTasks || 0;
                     
-                    // Agar database mein code save nahi hai toh background mein save bhi kar dega
-                    if(!user.myCode) {
+                    // Agar database mein pehle se code nahi hai toh save kar dein
+                    if (!user.myCode || user.myCode !== myInstantCode) {
                         userRef.update({ myCode: myInstantCode });
                     }
 
-                    // Total Invites count karna
-                    firebase.database().ref("users").once("value", (allUsersSnapshot) => {
+                    // Pure "users" node se scan karna ke is code ko kis kis ne use kiya hai
+                    db.ref("users").once("value", (allUsersSnapshot) => {
                         let count = 0;
                         allUsersSnapshot.forEach((childSnapshot) => {
                             const u = childSnapshot.val();
@@ -90,21 +113,36 @@
             });
         }
 
-        // Link Copy karne ka full alert system
+        // 3. Link Copy System
         function copyRef() {
             const codeText = document.getElementById("myUniqueCode").innerText;
-            if(codeText === "Generating...") {
-                alert("Pehle code generate hone dein!");
+            if(codeText === "EP-LOADING") {
+                alert("Thora intezar karein, code load ho raha hai...");
                 return;
             }
             
-            const link = "https://jnabg138-prog.github.io/EarnPro-/signup.html?ref=" + codeText;
+            // Signup link ke sath referral code attach karna
+            const link = "https://38-prog.github.io/signup.html?ref=" + codeText;
             
-            navigator.clipboard.writeText(link).then(() => {
-                alert("Mubarak ho! Referral link copy ho gaya hai:\n\n" + link);
-            }).catch(err => {
-                alert("Is link ko manually copy kar lein:\n\n" + link);
-            });
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(link).then(() => {
+                    alert("Copy Ho Gaya! Apne doston ko invite karein:\n\n" + link);
+                }).catch(err => {
+                    fallbackCopy(link);
+                });
+            } else {
+                fallbackCopy(link);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert("Referral link copy ho gaya!");
         }
     </script>
 </body>
