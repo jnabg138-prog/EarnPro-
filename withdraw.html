@@ -6,18 +6,26 @@
     <title>Withdraw - EarnPro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        input { 
+            width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; 
+            border: 1px solid #334155; background: #0f172a; 
+            color: white !important; /* Likhte waqt text white dikhega */
+        }
+        input::placeholder { color: #64748b; }
+    </style>
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo" onclick="window.location.href='index.html'">
+        <div class="logo" onclick="window.location.href='index.html'" style="cursor:pointer;">
             <i class="fa-solid fa-arrow-left"></i> Back
         </div>
         <div class="logo">Withdraw Profit</div>
         <div></div>
     </nav>
 
-    <div class="card" style="margin-top: 40px;">
-        <div style="text-align: center; margin-bottom: 20px;">
+    <div class="card" style="margin-top: 40px; text-align: center; padding: 20px;">
+        <div style="margin-bottom: 20px;">
             <i class="fa-solid fa-money-bill-transfer" style="font-size: 50px; color: #38bdf8;"></i>
         </div>
         
@@ -35,10 +43,10 @@
             </select>
 
             <label style="font-size: 12px; color: #38bdf8; margin-left: 5px;">Account Number</label>
-            <input type="text" id="wNumber" placeholder="Your Mobile Account Number">
+            <input type="number" id="wNumber" placeholder="03XXXXXXXXX">
         </div>
 
-        <button id="withdrawBtn" onclick="handleWithdraw()" style="margin-top: 20px; background: #22c55e; color: white;">
+        <button id="withdrawBtn" style="margin-top: 20px; background: #22c55e; color: white; width: 100%; padding: 15px; border-radius: 10px; font-weight: bold; border: none; cursor: pointer;">
             Confirm Withdrawal
         </button>
 
@@ -47,66 +55,104 @@
         </p>
     </div>
 
-    <script>
-        function handleWithdraw() {
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getDatabase, ref, get, update, push } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+        // Firebase Configuration (EarnPro Data)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAsUq4BEYktF7gTHMB3zaJNX-ugdPVTfoo",
+            authDomain: "earnpro-14953.firebaseapp.com",
+            databaseURL: "https://earnpro-14953-default-rtdb.firebaseio.com",
+            projectId: "earnpro-14953",
+            storageBucket: "earnpro-14953.firebasestorage.app",
+            messagingSenderId: "754662452601",
+            appId: "1:754662452601:web:0548a7ee79ffafc63f13a8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        document.getElementById("withdrawBtn").addEventListener("click", async () => {
             const amount = parseInt(document.getElementById("wAmount").value);
-            const number = document.getElementById("wNumber").value;
+            const number = document.getElementById("wNumber").value.trim();
             const method = document.getElementById("wMethod").value;
             const btn = document.getElementById("withdrawBtn");
-            const phone = localStorage.getItem("currentUser");
-            const user = JSON.parse(localStorage.getItem("user_" + phone));
+            
+            // LocalStorage se login user ka phone nikalna
+            const userPhone = localStorage.getItem("userPhone"); 
 
-            // 1. Shart: Deposit check (Plan "Free" nahi hona chahiye)
-            if (user.plan === "Free") {
-                alert("Withdrawal Error: Please upgrade your plan first to enable withdrawals!");
-                document.getElementById("note").style.display = "block";
+            if (!userPhone) {
+                alert("Session expired. Please login again.");
+                window.location.href = "login.html";
                 return;
             }
 
-            // 2. Shart: Minimum Limit 2500
             if (!amount || amount < 2500) {
                 alert("Minimum withdrawal limit is Rs. 2,500");
                 return;
             }
 
-            // 3. Shart: Balance check
-            if (user.balance < amount) {
-                alert("Insufficient balance! Your current balance is Rs. " + user.balance);
-                return;
-            }
-
             if (!number) {
-                alert("Please enter your account number!");
+                alert("Please enter account number!");
                 return;
             }
 
-            // Sab theek hai toh process karein
             btn.disabled = true;
-            btn.innerHTML = 'Processing...';
+            btn.innerHTML = "Checking Balance...";
 
-            // History mein pending request dalna
-            let history = JSON.parse(localStorage.getItem("transHistory") || "[]");
-            history.push({
-                user: phone,
-                type: "Withdraw",
-                amount: amount,
-                number: number,
-                method: method,
-                status: "Pending",
-                date: new Date().toLocaleString()
-            });
-            localStorage.setItem("transHistory", JSON.stringify(history));
+            const userRef = ref(db, 'users/' + userPhone);
+            
+            try {
+                const snapshot = await get(userRef);
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
 
-            // User ka balance deduct karna
-            user.balance -= amount;
-            localStorage.setItem("user_" + phone, JSON.stringify(user));
+                    // 1. Plan Check
+                    if (userData.plan === "Free") {
+                        alert("Upgrade your plan first to enable withdrawals!");
+                        document.getElementById("note").style.display = "block";
+                        btn.disabled = false;
+                        btn.innerHTML = "Confirm Withdrawal";
+                        return;
+                    }
 
-            setTimeout(() => {
-                // English message jesa aapne kaha
-                alert("Your withdrawal request has been submitted successfully. It will be completed within 24 hours.");
-                window.location.href = "index.html";
-            }, 2000);
-        }
+                    // 2. Balance Check
+                    if (userData.balance < amount) {
+                        alert("Insufficient balance! Current: Rs. " + userData.balance);
+                        btn.disabled = false;
+                        btn.innerHTML = "Confirm Withdrawal";
+                        return;
+                    }
+
+                    // 3. Process Withdrawal
+                    const newBalance = userData.balance - amount;
+                    
+                    // Update Balance in Firebase
+                    await update(userRef, { balance: newBalance });
+
+                    // Add to Withdraw Requests for Admin
+                    const withdrawRef = ref(db, 'withdrawRequests');
+                    await push(withdrawRef, {
+                        phone: userPhone,
+                        name: userData.name,
+                        amount: amount,
+                        method: method,
+                        number: number,
+                        status: "Pending",
+                        date: new Date().toLocaleString()
+                    });
+
+                    alert("Your withdrawal request has been submitted successfully. It will be completed within 24 hours.");
+                    window.location.href = "index.html";
+
+                }
+            } catch (error) {
+                alert("Error: " + error.message);
+                btn.disabled = false;
+                btn.innerHTML = "Confirm Withdrawal";
+            }
+        });
     </script>
 </body>
 </html>
