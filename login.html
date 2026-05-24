@@ -6,27 +6,48 @@
     <title>Login - EarnPro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #0b1329; margin: 0; font-family: sans-serif; }
+        .container { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .card { width: 100%; max-width: 400px; text-align: center; background: #1e293b; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        
+        /* Input Styling Fix (As per image ed34ae57-8388-4c7f-b6d3-0a7482a9ad6b) */
+        .input-group { text-align: left; margin-bottom: 15px; }
+        label { font-size: 14px; color: #38bdf8; display: block; margin-bottom: 5px; font-weight: 500; }
+        input { 
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; 
+            background: #0f172a; color: white !important; box-sizing: border-box; font-size: 15px;
+        }
+        input:focus { border-color: #38bdf8; outline: none; }
+
+        .btn-login { 
+            width: 100%; padding: 14px; margin-top: 20px; background: #38bdf8; 
+            color: #0f172a; font-weight: bold; border: none; border-radius: 8px; 
+            font-size: 16px; cursor: pointer; transition: 0.3s;
+        }
+        .btn-login:disabled { background: #64748b; cursor: not-allowed; }
+    </style>
 </head>
 <body>
-    <div class="container" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;">
-        <div class="card" style="width: 100%; max-width: 400px; text-align: center;">
-            <i class="fa-solid fa-right-to-bracket" style="font-size: 50px; color: #38bdf8; margin-bottom: 20px;"></i>
-            <h2>Welcome Back</h2>
-            <p style="font-size: 13px; color: #94a3b8; margin-bottom: 25px;">Login to manage your EarnPro account</p>
+    <div class="container">
+        <div class="card">
+            <i class="fa-solid fa-right-to-bracket" style="font-size: 60px; color: #38bdf8; margin-bottom: 15px;"></i>
+            <h2 style="color: white; margin: 10px 0;">Welcome Back</h2>
+            <p style="font-size: 14px; color: #94a3b8; margin-bottom: 30px;">Login to manage your EarnPro account</p>
 
-            <div style="text-align: left;">
-                <label style="font-size: 12px; color: #38bdf8; margin-left: 5px;">Mobile Number</label>
+            <div class="input-group">
+                <label>Mobile Number</label>
                 <input type="number" id="loginPhone" placeholder="03XXXXXXXXX">
+            </div>
 
-                <label style="font-size: 12px; color: #38bdf8; margin-left: 5px;">Password</label>
+            <div class="input-group">
+                <label>Password</label>
                 <input type="password" id="loginPass" placeholder="Enter password">
             </div>
 
-            <button id="loginBtn" onclick="login()" style="margin-top: 20px; background: #38bdf8; color: #0f172a; font-weight: bold;">
-                Login Account
-            </button>
+            <button id="loginBtn" onclick="login()" class="btn-login">Login Account</button>
 
-            <p style="margin-top: 20px; font-size: 14px; color: #94a3b8;">
+            <p style="margin-top: 25px; font-size: 14px; color: #94a3b8;">
                 Don't have an account? <a href="signup.html" style="color: #38bdf8; text-decoration: none; font-weight: bold;">Sign Up</a>
             </p>
         </div>
@@ -67,7 +88,10 @@
                 if(snapshot.exists()) {
                     const userData = snapshot.val();
                     if(userData.pass === pass) {
+                        // Fix: Dono keys set kar di hain taake withdraw file ko mil jayen
+                        localStorage.setItem("userPhone", phone);
                         localStorage.setItem("currentUser", phone);
+                        
                         alert("Login Successful!");
                         window.location.href = 'index.html';
                     } else {
@@ -76,12 +100,12 @@
                         btn.innerHTML = "Login Account";
                     }
                 } else {
-                    alert("User not found! Please sign up first.");
+                    alert("User not found!");
                     btn.disabled = false;
                     btn.innerHTML = "Login Account";
                 }
             }).catch((err) => {
-                alert("Database Error: " + err.message);
+                alert("Error: " + err.message);
                 btn.disabled = false;
                 btn.innerHTML = "Login Account";
             });
