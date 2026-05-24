@@ -9,26 +9,27 @@
 </head>
 <body>
     <div class="container" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;">
-        <div class="card" style="width: 100%; max-width: 400px; text-align: center;">
+        <div class="card" style="width: 100%; max-width: 400px; text-align: center; background: #0f172a; padding: 30px; border-radius: 15px; border: 1px solid #1e293b;">
             <i class="fa-solid fa-user-plus" style="font-size: 50px; color: #38bdf8; margin-bottom: 20px;"></i>
-            <h2 style="margin-bottom: 10px;">Create Account</h2>
-            <p style="font-size: 13px; color: #94a3b8; margin-bottom: 25px;">Join EarnPro & Start Earning</p>
+            <h2 style="margin-bottom: 10px; color: white;">Create Account</h2>
+            <p style="font-size: 13px; color: #94a3b8; margin-bottom: 25px;">Join EarnPro & Start Earning Today</p>
 
             <div style="text-align: left;">
                 <label style="font-size: 12px; color: #38bdf8; margin-left: 5px;">Full Name</label>
-                <input type="text" id="newName" placeholder="Ex: John Doe">
+                <input type="text" id="newName" placeholder="Ex: John Doe" style="width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #1e293b; background: #0b1329; color: white;">
 
                 <label style="font-size: 12px; color: #38bdf8; margin-left: 5px;">Mobile Number</label>
-                <input type="number" id="newPhone" placeholder="03XXXXXXXXX">
+                <input type="number" id="newPhone" placeholder="03XXXXXXXXX" style="width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #1e293b; background: #0b1329; color: white;">
 
                 <label style="font-size: 12px; color: #38bdf8; margin-left: 5px;">Password</label>
-                <input type="password" id="newPass" placeholder="Enter password">
+                <input type="password" id="newPass" placeholder="Enter password" style="width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #1e293b; background: #0b1329; color: white;">
 
-                <label style="font-size: 12px; color: #38bdf8; margin-left: 5px;">Referral Code (Optional)</label>
-                <input type="text" id="refBy" placeholder="Example: EP-A1B2" style="text-transform: uppercase;">
+                <label style="font-size: 12px; color: #38bdf8; margin-left: 5px;">Referral Code (Auto-Detected)</label>
+                <input type="text" id="refBy" placeholder="No Referral" style="text-transform: uppercase; width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #1e293b; background: #1e293b; color: #38bdf8; font-weight: bold;" readonly>
+                <small style="color: #64748b; font-size: 10px; margin-left: 5px;">Referral code link se khud detect ho jata hai.</small>
             </div>
 
-            <button id="signupBtn" style="margin-top: 20px; background: #38bdf8; color: #0f172a; font-weight: bold;">
+            <button id="signupBtn" style="margin-top: 25px; background: #38bdf8; color: #0f172a; font-weight: bold; width: 100%; padding: 14px; border-radius: 8px; border: none; cursor: pointer;">
                 Register Account
             </button>
 
@@ -52,54 +53,59 @@
             appId: "1:754662452601:web:0548a7ee79ffafc63f13a8"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Click Event Listener setup kiya taake type="module" mein function direct chal sake
+        // 🔥 URL se referral code "EP-XXXX" nikalne ka logic
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            if (refCode) {
+                document.getElementById("refBy").value = refCode.toUpperCase();
+                console.log("Referral Detected: " + refCode);
+            }
+        };
+
         document.getElementById("signupBtn").addEventListener("click", () => {
             const name = document.getElementById("newName").value.trim();
             const phone = document.getElementById("newPhone").value.trim();
             const pass = document.getElementById("newPass").value.trim();
-            const refBy = document.getElementById("refBy").value.trim().toUpperCase();
+            const refBy = document.getElementById("refBy").value.trim() || "NONE";
             const btn = document.getElementById("signupBtn");
 
             if(!name || !phone || !pass) {
-                alert("Jani, saari details bharna zaroori hain!");
+                alert("Please fill all fields!");
                 return;
             }
 
             btn.disabled = true;
-            btn.innerHTML = "Processing...";
+            btn.innerHTML = "Creating Account...";
 
             const userRef = ref(db, 'users/' + phone);
             
             get(userRef).then((snapshot) => {
                 if (snapshot.exists()) {
-                    alert("Ye number pehle se register hai!");
+                    alert("This phone number is already registered!");
                     btn.disabled = false;
                     btn.innerHTML = "Register Account";
                 } else {
-                    // Unique Referral Code Generator (English + Math)
-                    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-                    let uniqueCode = 'EP-';
-                    for (let i = 0; i < 4; i++) {
-                        uniqueCode += chars.charAt(Math.floor(Math.random() * chars.length));
-                    }
+                    // Unique Code for NEW user (for their own referrals)
+                    const myNewCode = "EP-" + phone.slice(-4) + Math.floor(10 + Math.random() * 90);
 
-                    // Save data to Firebase Realtime Database
                     set(userRef, {
                         name: name,
                         phone: phone,
                         pass: pass,
                         balance: 0,
                         plan: "Free",
-                        myCode: uniqueCode,
-                        referredBy: refBy || "None",
+                        myCode: myNewCode,
+                        referredBy: refBy, // Link wala code yahan save hoga
                         dailyTasks: 2,
-                        bonusTasks: 0
+                        bonusTasks: 0,
+                        tasksDone: 0,
+                        lastTaskDate: ""
                     }).then(() => {
-                        alert("Mubarak ho! Account ban gaya hai.\n\nApka Invite Code: " + uniqueCode);
+                        alert("Account Created Successfully!\nYour Invite Code: " + myNewCode);
                         window.location.href = 'login.html';
                     }).catch((error) => {
                         alert("Database Error: " + error.message);
@@ -108,7 +114,7 @@
                     });
                 }
             }).catch((error) => {
-                alert("Error checking user: " + error.message);
+                alert("Error: " + error.message);
                 btn.disabled = false;
                 btn.innerHTML = "Register Account";
             });
