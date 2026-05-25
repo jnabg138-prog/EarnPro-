@@ -34,7 +34,7 @@
         .status-pending { background: #eab308; color: #000; }
         .status-approved { background: #22c55e; color: #fff; }
         .status-rejected { background: #ef4444; color: #fff; }
-        .status-completed { background: #38bdf8; color: #fff; } /* Withdraw done hone par yeh color dikhega */
+        .status-completed { background: #38bdf8; color: #fff; } 
     </style>
 </head>
 <body>
@@ -69,52 +69,56 @@
         const db = getDatabase(app);
         const phone = localStorage.getItem("userPhone") || localStorage.getItem("currentUser");
 
-        if(!phone) { window.location.href = 'login.html'; }
+        if(!phone) { 
+            window.location.href = 'login.html'; 
+        } else {
+            loadHistory();
+        }
 
         function loadHistory() {
             const depRef = ref(db, 'deposits');
             const withPendingRef = ref(db, 'withdrawRequests');
-            const withDoneRef = ref(db, 'withdrawHistory'); // Completed withdrawals ka naya node
+            const withDoneRef = ref(db, 'withdrawHistory');
 
-            // Teeno nodes ko nesting ke zariye realtime listen karna
+            // Aik saath listen karne ke liye nested structure with null safety
             onValue(depRef, (snapshot) => {
-                const depData = snapshot.val();
+                const depData = snapshot.val() || {};
+                
                 onValue(withPendingRef, (pSnapshot) => {
-                    const pData = pSnapshot.val();
+                    const pData = pSnapshot.val() || {};
+                    
                     onValue(withDoneRef, (dSnapshot) => {
-                        const dData = dSnapshot.val();
+                        const dData = dSnapshot.val() || {};
                         
                         let allTransactions = [];
 
-                        // 1. Deposits Data Filter
-                        if(depData) {
-                            Object.values(depData).forEach(item => {
-                                if(item.phone === phone || item.user === phone) {
-                                    allTransactions.push({...item, type: 'Deposit'});
-                                }
-                            });
-                        }
+                        // 1. Deposits filter
+                        Object.values(depData).forEach(item => {
+                            if(item.phone === phone || item.user === phone) {
+                                allTransactions.push({...item, type: 'Deposit'});
+                            }
+                        });
 
-                        // 2. Pending Withdrawals Data Filter
-                        if(pData) {
-                            Object.values(pData).forEach(item => {
-                                if(item.phone === phone) {
-                                    allTransactions.push({...item, type: 'Withdraw', status: item.status || 'Pending'});
-                                }
-                            });
-                        }
+                        // 2. Pending Withdrawals filter
+                        Object.values(pData).forEach(item => {
+                            if(item.phone === phone) {
+                                allTransactions.push({...item, type: 'Withdraw', status: item.status || 'Pending'});
+                            }
+                        });
 
-                        // 3. Completed Withdrawals Data Filter (Jo pehle gayab ho jata tha)
-                        if(dData) {
-                            Object.values(dData).forEach(item => {
-                                if(item.phone === phone) {
-                                    allTransactions.push({...item, type: 'Withdraw', status: 'Completed'});
-                                }
-                            });
-                        }
+                        // 3. Completed Withdrawals filter
+                        Object.values(dData).forEach(item => {
+                            if(item.phone === phone) {
+                                allTransactions.push({...item, type: 'Withdraw', status: 'Completed'});
+                            }
+                        });
 
-                        // Sari transactions ko custom Date aur Time ke mutabiq Sort karna (Latest First)
-                        allTransactions.sort((a, b) => new Date(b.date || b.time) - new Date(a.date || a.time));
+                        // Sort latest first
+                        allTransactions.sort((a, b) => {
+                            const dateA = new Date(a.date || a.time);
+                            const dateB = new Date(b.date || b.time);
+                            return dateB - dateA;
+                        });
 
                         displayHistory(allTransactions);
                     });
@@ -124,45 +128,47 @@
 
         function displayHistory(data) {
             const container = document.getElementById("historyList");
+            const loader = document.getElementById("loader");
             container.innerHTML = "";
             
             if(data.length === 0) {
-                container.innerHTML = `<div style="text-align:center; color:#64748b; margin-top:50px;"><i class="fa-solid fa-folder-open" style="font-size: 40px; margin-bottom: 10px;"></i><p>No history found.</p></div>`;
-                document.getElementById("loader").style.display = "none";
-                return;
-            }
+                container.innerHTML = `
+                    <div style="text-align:center; color:#64748b; margin-top:50px;">
+                        <i class="fa-solid fa-folder-open" style="font-size: 40px; margin-bottom: 10px;"></i>
+                        <p>No transaction history found.</p>
+                    </div>`;
+            } else {
+                data.forEach(item => {
+                    const isDep = item.type === 'Deposit';
+                    const statusClass = "status-" + (item.status ? item.status.toLowerCase() : "pending");
+                    const icon = isDep ? "fa-arrow-down" : "fa-arrow-up";
+                    const iconColor = isDep ? "#22c55e" : "#ef4444";
+                    const amountPrefix = isDep ? "+" : "-";
 
-            data.forEach(item => {
-                const isDep = item.type === 'Deposit';
-                const statusClass = "status-" + (item.status ? item.status.toLowerCase() : "pending");
-                const icon = isDep ? "fa-arrow-down" : "fa-arrow-up";
-                const iconColor = isDep ? "#22c55e" : "#ef4444";
-                const amountPrefix = isDep ? "+" : "-";
-
-                container.innerHTML += `
-                    <div class="history-card">
-                        <div style="display: flex; align-items: center;">
-                            <div class="type-icon" style="background: ${iconColor}22; color: ${iconColor};">
-                                <i class="fa-solid ${icon}"></i>
+                    container.innerHTML += `
+                        <div class="history-card">
+                            <div style="display: flex; align-items: center;">
+                                <div class="type-icon" style="background: ${iconColor}22; color: ${iconColor};">
+                                    <i class="fa-solid ${icon}"></i>
+                                </div>
+                                <div>
+                                    <h4 style="margin: 0; color: #fff;">${amountPrefix} Rs. ${parseInt(item.amount).toLocaleString()}</h4>
+                                    <p style="margin: 3px 0 0; font-size: 11px; color: #94a3b8;">
+                                        ${isDep ? 'Deposit (TID: ' + (item.trxId || item.tid || 'N/A') + ')' : 'Withdrawal to ' + (item.method || 'Wallet')}
+                                    </p>
+                                    <p style="margin: 2px 0 0; font-size: 10px; color: #64748b;"><i class="fa-solid fa-calendar-days"></i> ${item.date || item.time}</p>
+                                </div>
                             </div>
                             <div>
-                                <h4 style="margin: 0; color: #fff;">${amountPrefix} Rs. ${parseInt(item.amount).toLocaleString()}</h4>
-                                <p style="margin: 3px 0 0; font-size: 11px; color: #94a3b8;">
-                                    ${isDep ? 'Deposit (TID: ' + (item.trxId || item.tid || 'N/A') + ')' : 'Withdrawal to ' + (item.method || 'Wallet')}
-                                </p>
-                                <p style="margin: 2px 0 0; font-size: 10px; color: #64748b;"><i class="fa-solid fa-calendar-days"></i> ${item.date || item.time}</p>
+                                <span class="status-badge ${statusClass}">${item.status || "Pending"}</span>
                             </div>
                         </div>
-                        <div>
-                            <span class="status-badge ${statusClass}">${item.status || "Pending"}</span>
-                        </div>
-                    </div>
-                `;
-            });
-            document.getElementById("loader").style.display = "none";
+                    `;
+                });
+            }
+            // Loader ko hamesha band hona chahiye data milne ke baad
+            loader.style.display = "none";
         }
-
-        loadHistory();
     </script>
 </body>
-</html>
+    </html>
