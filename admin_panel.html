@@ -1,14 +1,14 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EarnPro Super Admin</title>
+    <title>EarnPro Super Admin - Pro Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --bg: #0b1329; --card: #0f172a; --border: #1e293b; --text: #f8fafc; --primary: #38bdf8; --danger: #ef4444; --success: #22c55e; }
+        :root { --bg: #0b1329; --card: #0f172a; --border: #1e293b; --text: #f8fafc; --primary: #38bdf8; --danger: #ef4444; --success: #22c55e; --warning: #f59e0b; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); }
+        body { background: var(--bg); color: var(--text); padding-bottom: 50px; }
         
         #adminAuth { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .auth-card { background: var(--card); padding: 40px; border-radius: 15px; border: 1px solid var(--border); width: 100%; max-width: 400px; text-align: center; }
@@ -16,79 +16,66 @@
         .dashboard { display: none; padding: 20px; max-width: 1200px; margin: 0 auto; }
         .nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
         
-        .search-box { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); display: flex; gap: 10px; margin-bottom: 30px; }
-        input, select { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: #0b1329; color: white; outline: none; }
-        
-        .btn { padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-primary { background: var(--primary); color: #0f172a; }
+        .btn { padding: 8px 15px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 12px; }
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
         
-        .table-container { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow-x: auto; margin-bottom: 40px; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border); }
-        th { color: var(--primary); background: rgba(56, 189, 248, 0.05); }
+        .table-container { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow-x: auto; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--primary); background: rgba(56, 189, 248, 0.05); text-transform: uppercase; }
         
-        .section-title { margin: 20px 0 15px; display: flex; align-items: center; gap: 10px; color: var(--primary); }
+        .section-title { margin: 30px 0 15px; display: flex; align-items: center; gap: 10px; color: var(--primary); border-left: 4px solid var(--primary); padding-left: 15px; }
+        .log-entry { font-family: 'Courier New', monospace; font-size: 12px; padding: 5px 0; border-bottom: 1px dotted var(--border); }
+        .log-time { color: #64748b; margin-right: 10px; }
     </style>
 </head>
 <body>
 
     <div id="adminAuth">
         <div class="auth-card">
-            <i class="fa-solid fa-shield-halved" style="font-size: 50px; color: var(--primary); margin-bottom: 20px;"></i>
-            <h2>Admin Access</h2>
-            <input type="password" id="adminPass" placeholder="Enter Admin Password..." style="width: 100%; margin: 20px 0;">
-            <button onclick="checkAdmin()" class="btn btn-primary" style="width: 100%;">Unlock Dashboard</button>
+            <h2>Admin Login</h2>
+            <input type="password" id="adminPass" placeholder="Enter Password..." style="width: 100%; margin: 20px 0; padding: 12px; border-radius: 8px; background: #0b1329; color: white; border: 1px solid var(--border);">
+            <button onclick="checkAdmin()" class="btn" style="background:var(--primary); width: 100%;">Unlock Dashboard</button>
         </div>
     </div>
 
     <div class="dashboard" id="mainDashboard">
         <div class="nav">
-            <h2><i class="fa-solid fa-gauge-high"></i> Super Admin Panel</h2>
+            <h2><i class="fa-solid fa-crown"></i> EarnPro Admin</h2>
             <button onclick="location.reload()" class="btn btn-danger">Logout</button>
         </div>
 
-        <!-- Pending Withdraw Requests Box -->
-        <h3 class="section-title"><i class="fa-solid fa-money-bill-transfer"></i> Pending Withdrawals</h3>
+        <h3 class="section-title"><i class="fa-solid fa-users"></i> Registered Users</h3>
         <div class="table-container">
-            <table>
+            <table id="usersTable">
                 <thead>
-                    <tr>
-                        <th>User (Phone)</th>
-                        <th>Receiver Name</th>
-                        <th>Account Number</th>
-                        <th>Method</th>
-                        <th>Amount</th>
-                        <th>Date</th>
-                        <th>Action</th>
-                    </tr>
+                    <tr><th>Phone</th><th>Balance</th><th>Plan</th><th>Action</th></tr>
                 </thead>
-                <tbody id="withdrawTable"></tbody>
+                <tbody></tbody>
             </table>
         </div>
 
-        <!-- Pending Deposits Box -->
-        <h3 class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> Pending Deposits</h3>
+        <h3 class="section-title"><i class="fa-solid fa-money-bill-transfer"></i> Pending Withdrawals</h3>
         <div class="table-container">
-            <table>
+            <table id="withdrawTable">
                 <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Amount</th>
-                        <th>TID</th>
-                        <th>Time</th>
-                        <th>Action</th>
-                    </tr>
+                    <tr><th>User</th><th>Details</th><th>Amount</th><th>Action</th></tr>
                 </thead>
-                <tbody id="depositTable"></tbody>
+                <tbody></tbody>
             </table>
+        </div>
+
+        <!-- NEW: System Logs Section -->
+        <h3 class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> System Activity Logs</h3>
+        <div class="table-container" style="max-height: 300px; overflow-y: auto; padding: 15px;">
+            <div id="logsContainer"></div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        import { getDatabase, ref, onValue, update, remove, get, push } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAsUq4BEYktF7gTHMB3zaJNX-ugdPVTfoo",
@@ -107,68 +94,81 @@
             if(document.getElementById("adminPass").value === "786786") {
                 document.getElementById("adminAuth").style.display = "none";
                 document.getElementById("mainDashboard").style.display = "block";
-                loadAllData();
-            } else { alert("Wrong Password!"); }
+                loadRealtimeData();
+            } else { alert("Access Denied!"); }
         }
 
-        function loadAllData() {
-            // Load Deposits
-            onValue(ref(db, 'deposits'), (snapshot) => {
-                const tbody = document.getElementById("depositTable");
+        // LOG SAVING FUNCTION
+        function saveLog(action) {
+            const logRef = ref(db, 'adminLogs');
+            const newLog = {
+                action: action,
+                time: new Date().toLocaleString()
+            };
+            push(logRef, newLog);
+        }
+
+        function loadRealtimeData() {
+            // Live Users
+            onValue(ref(db, 'users'), (snap) => {
+                const tbody = document.querySelector("#usersTable tbody");
                 tbody.innerHTML = "";
-                const data = snapshot.val();
-                if(!data) return;
-                Object.keys(data).forEach(key => {
-                    const item = data[key];
-                    if(item.status === "Pending") {
-                        tbody.innerHTML += `<tr>
-                            <td>${item.phone}</td>
-                            <td>Rs. ${item.amount}</td>
-                            <td>${item.trxId}</td>
-                            <td>${item.time}</td>
-                            <td><button onclick="approveDep('${key}', '${item.phone}', ${item.amount})" class="btn btn-success">Approve</button></td>
-                        </tr>`;
-                    }
+                snap.forEach(child => {
+                    const user = child.val();
+                    tbody.innerHTML += `<tr>
+                        <td>${child.key}</td>
+                        <td><b>Rs. ${user.balance || 0}</b></td>
+                        <td>${user.plan || 'Free'}</td>
+                        <td><button onclick="editBalance('${child.key}')" class="btn" style="background:#1e293b; color:var(--primary);">Edit</button></td>
+                    </tr>`;
                 });
             });
 
-            // Load Withdrawals (Naya Section)
-            onValue(ref(db, 'withdrawRequests'), (snapshot) => {
-                const tbody = document.getElementById("withdrawTable");
+            // Live Logs (Hamesha ke liye save)
+            onValue(ref(db, 'adminLogs'), (snap) => {
+                const container = document.getElementById("logsContainer");
+                container.innerHTML = "";
+                const logs = [];
+                snap.forEach(child => logs.push(child.val()));
+                logs.reverse().forEach(log => {
+                    container.innerHTML += `<div class="log-entry"><span class="log-time">[${log.time}]</span> ${log.action}</div>`;
+                });
+            });
+
+            // Live Withdrawals
+            onValue(ref(db, 'withdrawRequests'), (snap) => {
+                const tbody = document.querySelector("#withdrawTable tbody");
                 tbody.innerHTML = "";
-                const data = snapshot.val();
-                if(!data) {
-                    tbody.innerHTML = "<tr><td colspan='7' style='text-align:center;'>No pending withdrawals</td></tr>";
-                    return;
-                }
-                Object.keys(data).forEach(key => {
-                    const item = data[key];
+                snap.forEach(child => {
+                    const item = child.val();
                     tbody.innerHTML += `<tr>
-                        <td><b>${item.phone}</b></td>
-                        <td>${item.name || 'N/A'}</td>
-                        <td style="color:#38bdf8; font-weight:bold;">${item.number}</td>
-                        <td><span style="background:#1e293b; padding:4px 8px; border-radius:5px;">${item.method}</span></td>
-                        <td style="color:#ef4444; font-weight:bold;">Rs. ${item.amount}</td>
-                        <td>${item.date}</td>
-                        <td>
-                            <button onclick="completeWithdraw('${key}')" class="btn btn-success" style="padding:5px 10px;">Done</button>
-                        </td>
+                        <td>${item.phone}</td>
+                        <td>${item.method} (${item.number})</td>
+                        <td style="color:var(--danger)">Rs. ${item.amount}</td>
+                        <td><button onclick="completeWithdraw('${child.key}')" class="btn btn-success">Done</button></td>
                     </tr>`;
                 });
             });
         }
 
-        window.completeWithdraw = function(key) {
-            if(confirm("Mark this withdrawal as completed?")) {
-                remove(ref(db, 'withdrawRequests/' + key)).then(() => alert("Withdrawal Completed!"));
+        window.editBalance = function(phone) {
+            const newBal = prompt("Enter new balance for " + phone);
+            if(newBal !== null) {
+                update(ref(db, 'users/' + phone), { balance: parseInt(newBal) })
+                .then(() => saveLog(`Manual Balance Update: ${phone} set to Rs. ${newBal}`));
             }
         }
 
-        window.approveDep = function(id, phone, amt) {
-            update(ref(db, 'deposits/' + id), { status: "Approved" });
-            // User balance logic yahan pehle se mojood thi
-            alert("Deposit Approved!");
+        window.completeWithdraw = function(key) {
+            get(ref(db, 'withdrawRequests/' + key)).then(snap => {
+                const data = snap.val();
+                data.status = "Completed";
+                update(ref(db, 'withdrawHistory/' + key), data).then(() => {
+                    remove(ref(db, 'withdrawRequests/' + key));
+                    saveLog(`Withdraw Approved: Rs. ${data.amount} for ${data.phone}`);
+                });
+            });
         }
     </script>
 </body>
-                                             </html>
+  </html>
