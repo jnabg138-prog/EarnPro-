@@ -34,7 +34,7 @@
         .status-pending { background: #eab308; color: #000; }
         .status-approved { background: #22c55e; color: #fff; }
         .status-rejected { background: #ef4444; color: #fff; }
-        .status-completed { background: #38bdf8; color: #fff; } /* Withdraw done ke liye */
+        .status-completed { background: #38bdf8; color: #fff; } /* Withdraw done hone par yeh color dikhega */
     </style>
 </head>
 <body>
@@ -72,41 +72,52 @@
         if(!phone) { window.location.href = 'login.html'; }
 
         function loadHistory() {
-            const historyContainer = document.getElementById("historyList");
             const depRef = ref(db, 'deposits');
-            const withRef = ref(db, 'withdrawRequests');
+            const withPendingRef = ref(db, 'withdrawRequests');
+            const withDoneRef = ref(db, 'withdrawHistory'); // Completed withdrawals ka naya node
 
-            let allTransactions = [];
-
-            // Dono nodes ko read karke combine karna
+            // Teeno nodes ko nesting ke zariye realtime listen karna
             onValue(depRef, (snapshot) => {
                 const depData = snapshot.val();
-                onValue(withRef, (withSnapshot) => {
-                    const withData = withSnapshot.val();
-                    allTransactions = [];
+                onValue(withPendingRef, (pSnapshot) => {
+                    const pData = pSnapshot.val();
+                    onValue(withDoneRef, (dSnapshot) => {
+                        const dData = dSnapshot.val();
+                        
+                        let allTransactions = [];
 
-                    // Deposits Add Karen
-                    if(depData) {
-                        Object.values(depData).forEach(item => {
-                            if(item.phone === phone || item.user === phone) {
-                                allTransactions.push({...item, type: 'Deposit'});
-                            }
-                        });
-                    }
+                        // 1. Deposits Data Filter
+                        if(depData) {
+                            Object.values(depData).forEach(item => {
+                                if(item.phone === phone || item.user === phone) {
+                                    allTransactions.push({...item, type: 'Deposit'});
+                                }
+                            });
+                        }
 
-                    // Withdrawals Add Karen
-                    if(withData) {
-                        Object.values(withData).forEach(item => {
-                            if(item.phone === phone) {
-                                allTransactions.push({...item, type: 'Withdraw'});
-                            }
-                        });
-                    }
+                        // 2. Pending Withdrawals Data Filter
+                        if(pData) {
+                            Object.values(pData).forEach(item => {
+                                if(item.phone === phone) {
+                                    allTransactions.push({...item, type: 'Withdraw', status: item.status || 'Pending'});
+                                }
+                            });
+                        }
 
-                    // Sort by Date (Latest First)
-                    allTransactions.sort((a, b) => new Date(b.date || b.time) - new Date(a.date || a.time));
+                        // 3. Completed Withdrawals Data Filter (Jo pehle gayab ho jata tha)
+                        if(dData) {
+                            Object.values(dData).forEach(item => {
+                                if(item.phone === phone) {
+                                    allTransactions.push({...item, type: 'Withdraw', status: 'Completed'});
+                                }
+                            });
+                        }
 
-                    displayHistory(allTransactions);
+                        // Sari transactions ko custom Date aur Time ke mutabiq Sort karna (Latest First)
+                        allTransactions.sort((a, b) => new Date(b.date || b.time) - new Date(a.date || a.time));
+
+                        displayHistory(allTransactions);
+                    });
                 });
             });
         }
@@ -116,7 +127,9 @@
             container.innerHTML = "";
             
             if(data.length === 0) {
-                container.innerHTML = `<div style="text-align:center; color:#64748b; margin-top:50px;">No history found.</div>`;
+                container.innerHTML = `<div style="text-align:center; color:#64748b; margin-top:50px;"><i class="fa-solid fa-folder-open" style="font-size: 40px; margin-bottom: 10px;"></i><p>No history found.</p></div>`;
+                document.getElementById("loader").style.display = "none";
+                return;
             }
 
             data.forEach(item => {
@@ -135,9 +148,9 @@
                             <div>
                                 <h4 style="margin: 0; color: #fff;">${amountPrefix} Rs. ${parseInt(item.amount).toLocaleString()}</h4>
                                 <p style="margin: 3px 0 0; font-size: 11px; color: #94a3b8;">
-                                    ${isDep ? 'Deposit (TID: ' + (item.trxId || item.tid) + ')' : 'Withdrawal to ' + item.method}
+                                    ${isDep ? 'Deposit (TID: ' + (item.trxId || item.tid || 'N/A') + ')' : 'Withdrawal to ' + (item.method || 'Wallet')}
                                 </p>
-                                <p style="margin: 2px 0 0; font-size: 10px; color: #64748b;">${item.date || item.time}</p>
+                                <p style="margin: 2px 0 0; font-size: 10px; color: #64748b;"><i class="fa-solid fa-calendar-days"></i> ${item.date || item.time}</p>
                             </div>
                         </div>
                         <div>
