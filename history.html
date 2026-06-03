@@ -17,7 +17,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            text-align: left;
         }
         .type-icon {
             width: 35px; height: 35px; border-radius: 50%;
@@ -25,19 +24,18 @@
             margin-right: 12px; font-size: 16px;
         }
         .status-badge {
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: bold;
-            text-transform: uppercase;
+            padding: 5px 10px; border-radius: 6px;
+            font-size: 10px; font-weight: bold; text-transform: uppercase;
         }
+        /* Status Colors */
         .status-pending { background: #eab308; color: #000; }
-        .status-approved { background: #22c55e; color: #fff; }
+        .status-approved, .status-success { background: #22c55e; color: #fff; }
         .status-rejected { background: #ef4444; color: #fff; }
-        .status-completed { background: #38bdf8; color: #fff; } 
+        .status-completed { background: #38bdf8; color: #fff; }
     </style>
 </head>
 <body>
+    <!-- Loader -->
     <div id="loader" style="position: fixed; inset: 0; background: #0f172a; color: #38bdf8; display: flex; justify-content: center; align-items: center; z-index: 9999;">
         <i class="fa-solid fa-circle-notch fa-spin"></i> &nbsp; Loading Transactions...
     </div>
@@ -53,7 +51,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAsUq4BEYktF7gTHMB3zaJNX-ugdPVTfoo",
@@ -75,99 +73,104 @@
             loadHistory();
         }
 
-        function loadHistory() {
-            const depRef = ref(db, 'deposits');
-            const withPendingRef = ref(db, 'withdrawRequests');
-            const withDoneRef = ref(db, 'withdrawHistory');
+        async function loadHistory() {
+            try {
+                // Teeno data nodes ko aik saath fetch karna
+                const [depSnap, pendSnap, doneSnap] = await Promise.all([
+                    get(ref(db, 'deposits')),
+                    get(ref(db, 'withdrawRequests')),
+                    get(ref(db, 'withdrawHistory'))
+                ]);
 
-            // Aik saath listen karne ke liye nested structure with null safety
-            onValue(depRef, (snapshot) => {
-                const depData = snapshot.val() || {};
-                
-                onValue(withPendingRef, (pSnapshot) => {
-                    const pData = pSnapshot.val() || {};
-                    
-                    onValue(withDoneRef, (dSnapshot) => {
-                        const dData = dSnapshot.val() || {};
-                        
-                        let allTransactions = [];
+                let allTransactions = [];
 
-                        // 1. Deposits filter
-                        Object.values(depData).forEach(item => {
-                            if(item.phone === phone || item.user === phone) {
-                                allTransactions.push({...item, type: 'Deposit'});
-                            }
-                        });
-
-                        // 2. Pending Withdrawals filter
-                        Object.values(pData).forEach(item => {
-                            if(item.phone === phone) {
-                                allTransactions.push({...item, type: 'Withdraw', status: item.status || 'Pending'});
-                            }
-                        });
-
-                        // 3. Completed Withdrawals filter
-                        Object.values(dData).forEach(item => {
-                            if(item.phone === phone) {
-                                allTransactions.push({...item, type: 'Withdraw', status: 'Completed'});
-                            }
-                        });
-
-                        // Sort latest first
-                        allTransactions.sort((a, b) => {
-                            const dateA = new Date(a.date || a.time);
-                            const dateB = new Date(b.date || b.time);
-                            return dateB - dateA;
-                        });
-
-                        displayHistory(allTransactions);
+                // 1. Deposits (Success Show Hoga)
+                if(depSnap.exists()) {
+                    Object.values(depSnap.val()).forEach(item => {
+                        if(item.phone === phone || item.user === phone) {
+                            allTransactions.push({
+                                ...item, 
+                                type: 'Deposit', 
+                                status: 'Success' 
+                            });
+                        }
                     });
-                });
-            });
+                }
+
+                // 2. Pending Withdraw Requests
+                if(pendSnap.exists()) {
+                    Object.values(pendSnap.val()).forEach(item => {
+                        if(item.phone === phone) {
+                            allTransactions.push({
+                                ...item, 
+                                type: 'Withdraw', 
+                                status: item.status || 'Pending' 
+                            });
+                        }
+                    });
+                }
+
+                // 3. Completed/Done Withdrawals
+                if(doneSnap.exists()) {
+                    Object.values(doneSnap.val()).forEach(item => {
+                        if(item.phone === phone) {
+                            allTransactions.push({
+                                ...item, 
+                                type: 'Withdraw', 
+                                status: 'Completed' 
+                            });
+                        }
+                    });
+                }
+
+                // Sort: Latest transactions hamesha upar (By Date/Time)
+                allTransactions.sort((a, b) => new Date(b.date || b.time) - new Date(a.date || a.time));
+
+                displayHistory(allTransactions);
+
+            } catch (error) {
+                console.error("Error loading data:", error);
+                document.getElementById("loader").style.display = "none";
+            }
         }
 
         function displayHistory(data) {
             const container = document.getElementById("historyList");
-            const loader = document.getElementById("loader");
+            document.getElementById("loader").style.display = "none";
             container.innerHTML = "";
             
             if(data.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align:center; color:#64748b; margin-top:50px;">
-                        <i class="fa-solid fa-folder-open" style="font-size: 40px; margin-bottom: 10px;"></i>
-                        <p>No transaction history found.</p>
-                    </div>`;
-            } else {
-                data.forEach(item => {
-                    const isDep = item.type === 'Deposit';
-                    const statusClass = "status-" + (item.status ? item.status.toLowerCase() : "pending");
-                    const icon = isDep ? "fa-arrow-down" : "fa-arrow-up";
-                    const iconColor = isDep ? "#22c55e" : "#ef4444";
-                    const amountPrefix = isDep ? "+" : "-";
+                container.innerHTML = `<div style="text-align:center; color:#64748b; margin-top:50px;"><p>No history found.</p></div>`;
+                return;
+            }
 
-                    container.innerHTML += `
-                        <div class="history-card">
-                            <div style="display: flex; align-items: center;">
-                                <div class="type-icon" style="background: ${iconColor}22; color: ${iconColor};">
-                                    <i class="fa-solid ${icon}"></i>
-                                </div>
-                                <div>
-                                    <h4 style="margin: 0; color: #fff;">${amountPrefix} Rs. ${parseInt(item.amount).toLocaleString()}</h4>
-                                    <p style="margin: 3px 0 0; font-size: 11px; color: #94a3b8;">
-                                        ${isDep ? 'Deposit (TID: ' + (item.trxId || item.tid || 'N/A') + ')' : 'Withdrawal to ' + (item.method || 'Wallet')}
-                                    </p>
-                                    <p style="margin: 2px 0 0; font-size: 10px; color: #64748b;"><i class="fa-solid fa-calendar-days"></i> ${item.date || item.time}</p>
-                                </div>
+            data.forEach(item => {
+                const isDep = item.type === 'Deposit';
+                const statusClass = "status-" + item.status.toLowerCase();
+                const icon = isDep ? "fa-arrow-down" : "fa-arrow-up";
+                const iconColor = isDep ? "#22c55e" : "#ef4444";
+                const amountPrefix = isDep ? "+" : "-";
+
+                container.innerHTML += `
+                    <div class="history-card">
+                        <div style="display: flex; align-items: center;">
+                            <div class="type-icon" style="background: ${iconColor}22; color: ${iconColor};">
+                                <i class="fa-solid ${icon}"></i>
                             </div>
                             <div>
-                                <span class="status-badge ${statusClass}">${item.status || "Pending"}</span>
+                                <h4 style="margin: 0; color: #fff;">${amountPrefix} Rs. ${parseInt(item.amount).toLocaleString()}</h4>
+                                <p style="margin: 3px 0 0; font-size: 11px; color: #94a3b8;">
+                                    ${isDep ? 'Deposit (TID: ' + (item.trxId || item.tid || 'N/A') + ')' : 'Withdrawal to ' + (item.method || 'Wallet')}
+                                </p>
+                                <p style="margin: 2px 0 0; font-size: 10px; color: #64748b;"><i class="fa-solid fa-calendar-days"></i> ${item.date || item.time}</p>
                             </div>
                         </div>
-                    `;
-                });
-            }
-            // Loader ko hamesha band hona chahiye data milne ke baad
-            loader.style.display = "none";
+                        <div>
+                            <span class="status-badge ${statusClass}">${item.status}</span>
+                        </div>
+                    </div>
+                `;
+            });
         }
     </script>
 </body>
