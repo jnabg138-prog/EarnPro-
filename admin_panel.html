@@ -3,72 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EarnPro Super Admin - Pro Edition</title>
+    <title>EarnPro Super Admin - Premium Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --bg: #0b1329; --card: #0f172a; --border: #1e293b; --text: #f8fafc; --primary: #38bdf8; --danger: #ef4444; --success: #22c55e; --warning: #f59e0b; }
+        :root { 
+            --bg: #0b1329; 
+            --card: #0f172a; 
+            --border: #1e293b; 
+            --text: #f8fafc; 
+            --primary: #38bdf8; 
+            --danger: #ef4444; 
+            --success: #22c55e; 
+            --warning: #f59e0b; 
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text); padding-bottom: 50px; }
         
         #adminAuth { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .auth-card { background: var(--card); padding: 40px; border-radius: 15px; border: 1px solid var(--border); width: 100%; max-width: 400px; text-align: center; }
+        .auth-card { background: var(--card); padding: 40px; border-radius: 15px; border: 1px solid var(--border); width: 100%; max-width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         
         .dashboard { display: none; padding: 20px; max-width: 1200px; margin: 0 auto; }
         .nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
         
-        .btn { padding: 8px 15px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 12px; }
+        .btn { padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 11px; margin-right: 5px; text-transform: uppercase; }
         .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #16a34a; }
         .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-primary { background: var(--primary); color: #0f172a; }
         
         .table-container { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow-x: auto; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); }
-        th { color: var(--primary); background: rgba(56, 189, 248, 0.05); text-transform: uppercase; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; }
+        th, td { padding: 14px 15px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        th { color: var(--primary); background: rgba(56, 189, 248, 0.05); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+        tr:hover { background: rgba(255,255,255,0.02); }
         
-        .section-title { margin: 30px 0 15px; display: flex; align-items: center; gap: 10px; color: var(--primary); border-left: 4px solid var(--primary); padding-left: 15px; }
-        .log-entry { font-family: 'Courier New', monospace; font-size: 12px; padding: 5px 0; border-bottom: 1px dotted var(--border); }
+        .section-title { margin: 30px 0 15px; display: flex; align-items: center; gap: 10px; color: var(--primary); border-left: 4px solid var(--primary); padding-left: 15px; font-size: 18px; font-weight: 700; }
+        .log-entry { font-family: 'Courier New', monospace; font-size: 12px; padding: 6px 0; border-bottom: 1px dotted var(--border); }
         .log-time { color: #64748b; margin-right: 10px; }
+        
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; }
+        .badge-pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid var(--warning); }
     </style>
 </head>
 <body>
 
     <div id="adminAuth">
         <div class="auth-card">
-            <h2>Admin Login</h2>
-            <input type="password" id="adminPass" placeholder="Enter Password..." style="width: 100%; margin: 20px 0; padding: 12px; border-radius: 8px; background: #0b1329; color: white; border: 1px solid var(--border);">
-            <button onclick="checkAdmin()" class="btn" style="background:var(--primary); width: 100%;">Unlock Dashboard</button>
+            <i class="fa-solid fa-lock" style="font-size: 40px; color: var(--primary); margin-bottom: 15px;"></i>
+            <h2>Admin Security Login</h2>
+            <input type="password" id="adminPass" placeholder="Enter Secure Password..." style="width: 100%; margin: 20px 0; padding: 12px; border-radius: 8px; background: #0b1329; color: white; border: 1px solid var(--border); text-align: center; font-size: 16px;">
+            <button onclick="checkAdmin()" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 14px;">Unlock Dashboard</button>
         </div>
     </div>
 
     <div class="dashboard" id="mainDashboard">
         <div class="nav">
-            <h2><i class="fa-solid fa-crown"></i> EarnPro Admin</h2>
-            <button onclick="location.reload()" class="btn btn-danger">Logout</button>
+            <h2><i class="fa-solid fa-crown" style="color: var(--warning);"></i> EarnPro Master Admin</h2>
+            <button onclick="location.reload()" class="btn btn-danger"><i class="fa-solid fa-power-off"></i> Logout</button>
         </div>
 
         <h3 class="section-title"><i class="fa-solid fa-users"></i> Registered Users</h3>
         <div class="table-container">
             <table id="usersTable">
                 <thead>
-                    <tr><th>Phone</th><th>Balance</th><th>Plan</th><th>Action</th></tr>
+                    <tr><th>Phone Number</th><th>Main Balance</th><th>Active Plan</th><th>Actions</th></tr>
                 </thead>
                 <tbody></tbody>
             </table>
         </div>
 
-        <h3 class="section-title"><i class="fa-solid fa-money-bill-transfer"></i> Pending Withdrawals</h3>
+        <h3 class="section-title"><i class="fa-solid fa-wallet"></i> Pending Deposit Requests</h3>
+        <div class="table-container">
+            <table id="depositTable">
+                <thead>
+                    <tr><th>User Phone</th><th>Amount (PKR)</th><th>Transaction ID (TrxID)</th><th>Time Submitted</th><th>Status</th><th>Actions</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <h3 class="section-title"><i class="fa-solid fa-money-bill-transfer"></i> Pending Withdrawal Requests</h3>
         <div class="table-container">
             <table id="withdrawTable">
                 <thead>
-                    <tr><th>User</th><th>Details</th><th>Amount</th><th>Action</th></tr>
+                    <tr><th>User Phone</th><th>Payment Method</th><th>Account Details</th><th>Amount</th><th>Status</th><th>Actions</th></tr>
                 </thead>
                 <tbody></tbody>
             </table>
         </div>
 
-        <!-- NEW: System Logs Section -->
-        <h3 class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> System Activity Logs</h3>
-        <div class="table-container" style="max-height: 300px; overflow-y: auto; padding: 15px;">
+        <h3 class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> Realtime System Logs</h3>
+        <div class="table-container" style="max-height: 250px; overflow-y: auto; padding: 15px; background: #070d19;">
             <div id="logsContainer"></div>
         </div>
     </div>
@@ -95,36 +121,34 @@
                 document.getElementById("adminAuth").style.display = "none";
                 document.getElementById("mainDashboard").style.display = "block";
                 loadRealtimeData();
-            } else { alert("Access Denied!"); }
+            } else { alert("Access Denied! Incorrect Password."); }
         }
 
-        // LOG SAVING FUNCTION
         function saveLog(action) {
             const logRef = ref(db, 'adminLogs');
-            const newLog = {
+            push(logRef, {
                 action: action,
                 time: new Date().toLocaleString()
-            };
-            push(logRef, newLog);
+            });
         }
 
         function loadRealtimeData() {
-            // Live Users
+            // Live Users Connection
             onValue(ref(db, 'users'), (snap) => {
                 const tbody = document.querySelector("#usersTable tbody");
                 tbody.innerHTML = "";
                 snap.forEach(child => {
                     const user = child.val();
                     tbody.innerHTML += `<tr>
-                        <td>${child.key}</td>
-                        <td><b>Rs. ${user.balance || 0}</b></td>
-                        <td>${user.plan || 'Free'}</td>
-                        <td><button onclick="editBalance('${child.key}')" class="btn" style="background:#1e293b; color:var(--primary);">Edit</button></td>
+                        <td><b>${child.key}</b></td>
+                        <td style="color:var(--success)"><b>Rs. ${user.balance || 0}</b></td>
+                        <td><span style="color:var(--primary)">${user.plan || 'Free Plan'}</span></td>
+                        <td><button onclick="editBalance('${child.key}')" class="btn btn-primary"><i class="fa-solid fa-pen-to-square"></i> Edit Balance</button></td>
                     </tr>`;
                 });
             });
 
-            // Live Logs (Hamesha ke liye save)
+            // Live Logs Connection
             onValue(ref(db, 'adminLogs'), (snap) => {
                 const container = document.getElementById("logsContainer");
                 container.innerHTML = "";
@@ -135,7 +159,30 @@
                 });
             });
 
-            // Live Withdrawals
+            // Live Deposits Connection (NEW)
+            onValue(ref(db, 'deposits'), (snap) => {
+                const tbody = document.querySelector("#depositTable tbody");
+                tbody.innerHTML = "";
+                snap.forEach(child => {
+                    const dep = child.val();
+                    if(dep.status === "Pending") {
+                        tbody.innerHTML += `<tr>
+                            <td>${dep.phone}</td>
+                            <td style="color:var(--success); font-weight:bold;">Rs. ${dep.amount}</td>
+                            <td><code style="background:#1e293b; padding:4px 8px; border-radius:4px;">${dep.trxId}</code></td>
+                            <td>${dep.time}</td>
+                            <td><span class="badge badge-pending">Pending</span></td>
+                            <td>
+                                <button onclick="handleDeposit('${child.key}', 'Approve')" class="btn btn-success"><i class="fa-solid fa-check"></i> Approve</button>
+                                <button onclick="handleDeposit('${child.key}', 'Reject')" class="btn btn-danger"><i class="fa-solid fa-xmark"></i> Reject</button>
+                            </td>
+                        </tr>`;
+                    }
+                });
+                if(tbody.innerHTML === "") { tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; color:#64748b;'>No pending deposits found.</td></tr>"; }
+            });
+
+            // Live Withdrawals Connection (UPDATED WITH APPROVE/REJECT)
             onValue(ref(db, 'withdrawRequests'), (snap) => {
                 const tbody = document.querySelector("#withdrawTable tbody");
                 tbody.innerHTML = "";
@@ -143,32 +190,111 @@
                     const item = child.val();
                     tbody.innerHTML += `<tr>
                         <td>${item.phone}</td>
-                        <td>${item.method} (${item.number})</td>
-                        <td style="color:var(--danger)">Rs. ${item.amount}</td>
-                        <td><button onclick="completeWithdraw('${child.key}')" class="btn btn-success">Done</button></td>
+                        <td><span style="color:var(--primary); font-weight:600;">${item.method}</span></td>
+                        <td>${item.number || 'N/A'}</td>
+                        <td style="color:var(--danger); font-weight:bold;">Rs. ${item.amount}</td>
+                        <td><span class="badge badge-pending">Pending</span></td>
+                        <td>
+                            <button onclick="handleWithdraw('${child.key}', 'Approve')" class="btn btn-success"><i class="fa-solid fa-check"></i> Done</button>
+                            <button onclick="handleWithdraw('${child.key}', 'Reject')" class="btn btn-danger"><i class="fa-solid fa-xmark"></i> Reject</button>
+                        </td>
                     </tr>`;
                 });
+                if(tbody.innerHTML === "") { tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; color:#64748b;'>No pending withdrawals found.</td></tr>"; }
             });
         }
 
+        // EDIT BALANCE FUNCTION
         window.editBalance = function(phone) {
             const newBal = prompt("Enter new balance for " + phone);
-            if(newBal !== null) {
+            if(newBal !== null && newBal !== "") {
                 update(ref(db, 'users/' + phone), { balance: parseInt(newBal) })
-                .then(() => saveLog(`Manual Balance Update: ${phone} set to Rs. ${newBal}`));
+                .then(() => saveLog(`Manual Balance Update: ${phone} balance set to Rs. ${newBal}`));
             }
         }
 
-        window.completeWithdraw = function(key) {
-            get(ref(db, 'withdrawRequests/' + key)).then(snap => {
+        // DEPOSIT ACTION LOGIC (APPROVE / REJECT)
+        window.handleDeposit = function(key, action) {
+            get(ref(db, 'deposits/' + key)).then(snap => {
+                if(!snap.exists()) return;
                 const data = snap.val();
-                data.status = "Completed";
-                update(ref(db, 'withdrawHistory/' + key), data).then(() => {
-                    remove(ref(db, 'withdrawRequests/' + key));
-                    saveLog(`Withdraw Approved: Rs. ${data.amount} for ${data.phone}`);
-                });
+                const userPhone = data.phone;
+                const amount = parseInt(data.amount);
+
+                if (action === "Approve") {
+                    // Step A: User node se current balance uthana aur add karna
+                    get(ref(db, 'users/' + userPhone)).then(userSnap => {
+                        let currentBalance = 0;
+                        let currentPlan = "Basic";
+                        if(userSnap.exists()){
+                            currentBalance = userSnap.val().balance || 0;
+                        }
+                        
+                        // Plan determine karna based on deposit amount
+                        if(amount >= 2000) currentPlan = "Premium";
+
+                        const newBalance = currentBalance + amount;
+
+                        // Step B: User ka balance aur plan update karna
+                        update(ref(db, 'users/' + userPhone), { 
+                            balance: newBalance,
+                            plan: currentPlan
+                        }).then(() => {
+                            // Step C: History update & Clean requests
+                            updateHistoryAndRemoveRequest('deposits', key, userPhone, 'Approved', data);
+                            saveLog(`Deposit Approved: Rs. ${amount} added to ${userPhone}. Plan set to ${currentPlan}`);
+                        });
+                    });
+                } else {
+                    // Reject Logic
+                    updateHistoryAndRemoveRequest('deposits', key, userPhone, 'Rejected', data);
+                    saveLog(`Deposit Rejected: TrxID ${data.trxId} for ${userPhone}`);
+                }
             });
+        }
+
+        // WITHDRAW ACTION LOGIC (DONE / REJECT)
+        window.handleWithdraw = function(key, action) {
+            get(ref(db, 'withdrawRequests/' + key)).then(snap => {
+                if(!snap.exists()) return;
+                const data = snap.val();
+                const userPhone = data.phone;
+                const amount = parseInt(data.amount);
+
+                if(action === "Approve") {
+                    // Approve execution
+                    updateHistoryAndRemoveRequest('withdrawRequests', key, userPhone, 'Completed', data);
+                    saveLog(`Withdraw Approved: Rs. ${amount} sent to ${userPhone}`);
+                } else {
+                    // Reject execution: User ko paise wapis return karna balance mein
+                    get(ref(db, 'users/' + userPhone)).then(userSnap => {
+                        let currentBalance = 0;
+                        if(userSnap.exists()){ currentBalance = userSnap.val().balance || 0; }
+                        
+                        update(ref(db, 'users/' + userPhone), { balance: currentBalance + amount })
+                        .then(() => {
+                            updateHistoryAndRemoveRequest('withdrawRequests', key, userPhone, 'Rejected', data);
+                            saveLog(`Withdraw Rejected: Rs. ${amount} refunded to ${userPhone}`);
+                        });
+                    });
+                }
+            });
+        }
+
+        // HELPER: Sync history node and remove pending data safely
+        function updateHistoryAndRemoveRequest(nodePath, key, phone, finalStatus, data) {
+            data.status = finalStatus;
+            
+            // 1. Archives node update karna (Global records)
+            const historyNode = nodePath === 'deposits' ? 'depositHistory' : 'withdrawHistory';
+            update(ref(db, `${historyNode}/${key}`), data);
+
+            // 2. User ki apni private personal transaction history update karna
+            update(ref(db, `history/${phone}/${key}`), { status: finalStatus });
+
+            // 3. Pending requests node se remove karna
+            remove(ref(db, `${nodePath}/${key}`));
         }
     </script>
 </body>
-  </html>
+    </html>
