@@ -16,7 +16,6 @@
         .btn { background: #38bdf8; color: #0f172a; border: none; padding: 14px 24px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.2s; box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2); }
         .btn:hover { background: #0ea5e9; transform: translateY(-2px); }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .stat-card { background: #1e293b; border: 1px solid #334155; padding: 15px; border-radius: 10px; }
         .stat-card h3 { font-size: 24px; color: #38bdf8; margin-bottom: 5px; font-weight: 800; }
         .stat-card p { font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
@@ -63,42 +62,34 @@
             appId: "1:754662452601:web:0548a7ee79ffafc63f13a8"
         };
 
-        // Initialize Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.database();
 
-        // 2. User Authentication Check (Dono check laga diye taake session out na ho)
+        // 2. User Authentication Check
         const phone = localStorage.getItem("userPhone") || localStorage.getItem("currentUser");
 
         if (!phone) {
             alert("Session expire ho gaya! Pehle login karein.");
             window.location.href = "login.html";
         } else {
-            // Instant Code Generation: Phone ke aakhri 6 digit se code banana
             const lastSixDigits = phone.toString().slice(-6); 
             const myInstantCode = "EP-" + lastSixDigits;
             
-            // Screen par foran display karein
             document.getElementById("myUniqueCode").innerText = myInstantCode;
 
-            // Database Sync
             const userRef = db.ref("users/" + phone);
             
-            // Stats aur Bonus check karne ke liye listener
             userRef.on("value", (snapshot) => {
                 const user = snapshot.val();
                 if (user) {
-                    // Permanent bonus tasks dikhana
                     document.getElementById("permBonus").innerText = user.bonusTasks || 0;
                     
-                    // Agar database mein pehle se code nahi hai toh save kar dein
                     if (!user.myCode || user.myCode !== myInstantCode) {
                         userRef.update({ myCode: myInstantCode });
                     }
 
-                    // Pure "users" node se scan karna ke is code ko kis kis ne use kiya hai
                     db.ref("users").once("value", (allUsersSnapshot) => {
                         let count = 0;
                         allUsersSnapshot.forEach((childSnapshot) => {
@@ -113,7 +104,7 @@
             });
         }
 
-        // 3. Dynamic Link Copy System (Fixes 404 Error completely)
+        // 3. Smart Link Copy System (Handles Sub-folders and File Names perfectly)
         function copyRef() {
             const codeText = document.getElementById("myUniqueCode").innerText;
             if(codeText === "EP-LOADING") {
@@ -121,9 +112,20 @@
                 return;
             }
             
-            // window.location.origin khud hi 'https://jnabg138-prog.github.io' ya jo bhi live domain hai utha lega
-            const currentDomain = window.location.origin;
-            const link = currentDomain + "/signup.html?ref=" + codeText;
+            // Poora current URL lein (e.g., https://jnabg138-prog.github.io/EarnPro/refer.html)
+            let currentUrl = window.location.href;
+            
+            // Agar URL ke aakhri mein query parameters hain (? se aagay) toh unhe saaf karein
+            if (currentUrl.indexOf("?") > -1) {
+                currentUrl = currentUrl.split("?")[0];
+            }
+            
+            // Aakhri file ka naam nikal kar 'signup.html' se replace karein
+            const lastSlashIndex = currentUrl.lastIndexOf("/");
+            const basePath = currentUrl.substring(0, lastSlashIndex + 1);
+            
+            // Final path tayar: Yeh aapki repository ke folders ko automatically sath jore rakhega
+            const link = basePath + "signup.html?ref=" + codeText;
             
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(link).then(() => {
@@ -147,4 +149,4 @@
         }
     </script>
 </body>
-</html>
+    </html>
