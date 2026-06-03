@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #0b1329; color: #ffffff; margin: 0; font-family: 'Poppins', sans-serif; }
+        body { background-color: #0b1329; color: #ffffff; margin: 0; font-family: sans-serif; }
         .input-group { margin-bottom: 20px; text-align: left; }
         .input-group label { display: block; font-size: 13px; color: #38bdf8; margin-bottom: 8px; font-weight: 600; }
         .modern-input {
@@ -83,7 +83,7 @@
             document.getElementById("depAmount").value = selectedAmount;
         }
 
-        // Module mein onclick handle karne ka sahi tareeqa
+        // Click Event Handler
         document.getElementById("depBtn").addEventListener("click", async () => {
             const amount = document.getElementById("depAmount").value.trim();
             const trx = document.getElementById("depTrx").value.trim();
@@ -96,16 +96,16 @@
             }
 
             if(!amount || !trx) {
-                alert("Please fill all fields!");
+                alert("Jani, saari details fill karo!");
                 return;
             }
 
             btn.disabled = true;
             btn.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> Submitting...";
 
-            const depRef = ref(db, 'deposits');
-            const newDepRef = push(depRef);
             const timestamp = new Date().toLocaleString();
+            const depRef = ref(db, 'deposits');
+            const newDepRef = push(depRef); // Yeh uniquely key generate karega
 
             const depositData = {
                 phone: phone,
@@ -117,22 +117,22 @@
             };
 
             try {
-                // Main deposits node mein save karna
+                // 1. Global node mein push karna (Taqay admin dekh sakay)
                 await set(newDepRef, depositData);
                 
-                // History node mein bhi save karna for user view
-                const userHistoryRef = ref(db, `history/${phone}/${newDepRef.key}`);
+                // 2. User ki apni personal history node mein copy save karna
+                const userHistoryRef = ref(db, 'history/' + phone + '/' + newDepRef.key);
                 await set(userHistoryRef, depositData);
 
                 localStorage.removeItem("selectedPlanAmount");
-                alert("Deposit submitted! Admin will verify in 30 mins.");
+                alert("Deposit request successfully submitted!");
                 window.location.href = 'history.html';
             } catch (err) {
-                alert("Error: " + err.message);
+                alert("Firebase Error: " + err.message);
                 btn.disabled = false;
                 btn.innerHTML = "Submit Request";
             }
         });
     </script>
 </body>
-    </html>
+</html>
