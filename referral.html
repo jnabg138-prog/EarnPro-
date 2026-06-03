@@ -16,6 +16,7 @@
         .btn { background: #38bdf8; color: #0f172a; border: none; padding: 14px 24px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.2s; box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2); }
         .btn:hover { background: #0ea5e9; transform: translateY(-2px); }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .stat-card { background: #1e293b; border: 1px solid #334155; padding: 15px; border-radius: 10px; }
         .stat-card h3 { font-size: 24px; color: #38bdf8; margin-bottom: 5px; font-weight: 800; }
         .stat-card p { font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
@@ -26,7 +27,7 @@
 <body>
 
     <div class="container">
-        <a href="index.html" class="back-link" style="text-align: left; margin-bottom: 10px; display: inline-block; width: 100%;"><i class="fa-solid fa-arrow-left"></i> ← Back to Dashboard</a>
+        <a href="index.html" class="back-link" style="text-align: left; margin-bottom: 10px; display: inline-block; width: 100%;">← Back to Dashboard</a>
         <h2>Refer & Earn</h2>
         
         <div class="code-box">
@@ -47,12 +48,11 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs (Using Version 8 for Compatibility) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
     <script>
-        // 1. Firebase Configuration (Apne Dashboard se match karein)
+        // 1. Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAsUq4BEYktF7gTHMB3zaJNX-ugdPVTfoo",
             authDomain: "earnpro-14953.firebaseapp.com",
@@ -69,11 +69,11 @@
         }
         const db = firebase.database();
 
-        // 2. User Authentication Check
-        const phone = localStorage.getItem("currentUser");
+        // 2. User Authentication Check (Dono check laga diye taake session out na ho)
+        const phone = localStorage.getItem("userPhone") || localStorage.getItem("currentUser");
 
         if (!phone) {
-            alert("Sashan expire ho gaya! Pehle login karein.");
+            alert("Session expire ho gaya! Pehle login karein.");
             window.location.href = "login.html";
         } else {
             // Instant Code Generation: Phone ke aakhri 6 digit se code banana
@@ -113,7 +113,7 @@
             });
         }
 
-        // 3. Link Copy System
+        // 3. Dynamic Link Copy System (Fixes 404 Error completely)
         function copyRef() {
             const codeText = document.getElementById("myUniqueCode").innerText;
             if(codeText === "EP-LOADING") {
@@ -121,8 +121,9 @@
                 return;
             }
             
-            // Signup link ke sath referral code attach karna
-            const link = "https://38-prog.github.io/signup.html?ref=" + codeText;
+            // window.location.origin khud hi 'https://jnabg138-prog.github.io' ya jo bhi live domain hai utha lega
+            const currentDomain = window.location.origin;
+            const link = currentDomain + "/signup.html?ref=" + codeText;
             
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(link).then(() => {
