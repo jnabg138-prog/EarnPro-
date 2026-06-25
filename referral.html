@@ -51,6 +51,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
     <script>
+        // 1. Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAsUq4BEYktF7gTHMB3zaJNX-ugdPVTfoo",
             authDomain: "earnpro-14953.firebaseapp.com",
@@ -61,46 +62,91 @@
             appId: "1:754662452601:web:0548a7ee79ffafc63f13a8"
         };
 
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const db = firebase.database();
+
+        // 2. User Authentication Check
         const phone = localStorage.getItem("userPhone") || localStorage.getItem("currentUser");
 
         if (!phone) {
+            alert("Session expire ho gaya! Pehle login karein.");
             window.location.href = "login.html";
         } else {
-            const myCode = "EP-" + phone.toString().slice(-6);
-            document.getElementById("myUniqueCode").innerText = myCode;
+            const lastSixDigits = phone.toString().slice(-6); 
+            const myInstantCode = "EP-" + lastSixDigits;
+            
+            document.getElementById("myUniqueCode").innerText = myInstantCode;
 
-            // یہ فنکشن پورے ڈیٹا بیس کو اسکین کرے گا
-            db.ref("users").on("value", (snapshot) => {
-                let inviteCount = 0;
-                
-                snapshot.forEach((childSnapshot) => {
-                    const userData = childSnapshot.val();
-                    // یہاں ہم چیک کر رہے ہیں کہ کس کا 'referredBy' ہمارے کوڈ کے برابر ہے
-                    if (userData.referredBy === myCode) {
-                        inviteCount++;
+            const userRef = db.ref("users/" + phone);
+            
+            userRef.on("value", (snapshot) => {
+                const user = snapshot.val();
+                if (user) {
+                    document.getElementById("permBonus").innerText = user.bonusTasks || 0;
+                    
+                    if (!user.myCode || user.myCode !== myInstantCode) {
+                        userRef.update({ myCode: myInstantCode });
                     }
-                });
 
-                // UI کو اپ ڈیٹ کریں
-                document.getElementById("totalInvites").innerText = inviteCount;
-                
-                // اگر آپ بونس ٹاسک بھی خود کار کرنا چاہیں تو یہاں کر سکتے ہیں
-                // مثلاً: document.getElementById("permBonus").innerText = inviteCount * 2;
+                    db.ref("users").once("value", (allUsersSnapshot) => {
+                        let count = 0;
+                        allUsersSnapshot.forEach((childSnapshot) => {
+                            const u = childSnapshot.val();
+                            if (u.referredBy === myInstantCode) {
+                                count++;
+                            }
+                        });
+                        document.getElementById("totalInvites").innerText = count;
+                    });
+                }
             });
         }
 
+        // 3. Smart Link Copy System (Handles Sub-folders and File Names perfectly)
         function copyRef() {
-            const code = document.getElementById("myUniqueCode").innerText;
-            const link = window.location.origin + "/signup.html?ref=" + code;
+            const codeText = document.getElementById("myUniqueCode").innerText;
+            if(codeText === "EP-LOADING") {
+                alert("Thora intezar karein, code load ho raha hai...");
+                return;
+            }
+            
+            // Poora current URL lein (e.g., https://jnabg138-prog.github.io/EarnPro/refer.html)
+            let currentUrl = window.location.href;
+            
+            // Agar URL ke aakhri mein query parameters hain (? se aagay) toh unhe saaf karein
+            if (currentUrl.indexOf("?") > -1) {
+                currentUrl = currentUrl.split("?")[0];
+            }
+            
+            // Aakhri file ka naam nikal kar 'signup.html' se replace karein
+            const lastSlashIndex = currentUrl.lastIndexOf("/");
+            const basePath = currentUrl.substring(0, lastSlashIndex + 1);
+            
+            // Final path tayar: Yeh aapki repository ke folders ko automatically sath jore rakhega
+            const link = basePath + "signup.html?ref=" + codeText;
             
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(link).then(() => {
-                    alert("Referral link copy ho gaya!");
+                    alert("Copy Ho Gaya! Apne doston ko invite karein:\n\n" + link);
+                }).catch(err => {
+                    fallbackCopy(link);
                 });
+            } else {
+                fallbackCopy(link);
             }
+        }
+
+        function fallbackCopy(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert("Referral link copy ho gaya!");
         }
     </script>
 </body>
-</html>
+    </html>
