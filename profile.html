@@ -6,22 +6,45 @@
     <title>My Profile - EarnPro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* گہرا نیلا بیک گراؤنڈ سیٹ کیا گیا ہے */
+        body {
+            background-color: #0c121e;
+            color: #fff;
+            margin: 0;
+            font-family: sans-serif;
+        }
+        .profile-input {
+            width: 100%; 
+            padding: 12px; 
+            background: #0f172a; 
+            border: 1px solid #334155; 
+            color: #fff; 
+            border-radius: 8px; 
+            margin-bottom: 12px; 
+            box-sizing: border-box;
+        }
+        .profile-input:focus {
+            border-color: #38bdf8;
+            outline: none;
+        }
+    </style>
 </head>
 <body>
-    <div id="loader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; color: #38bdf8; display: flex; justify-content: center; align-items: center; z-index: 9999; font-weight: bold;">
+    <div id="loader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0c121e; color: #38bdf8; display: flex; justify-content: center; align-items: center; z-index: 9999; font-weight: bold;">
         <i class="fa-solid fa-circle-notch fa-spin" style="margin-right: 10px;"></i> Loading Profile...
     </div>
 
-    <nav class="navbar" style="display: flex; align-items: center; padding: 15px; background: #1e293b;">
+    <nav class="navbar" style="display: flex; align-items: center; padding: 15px; background: #0c121e;">
         <a href="index.html" style="color: #38bdf8; text-decoration: none; margin-right: 15px; font-size: 18px;"><i class="fa-solid fa-arrow-left"></i></a>
         <div style="font-weight: bold; color: #fff; font-size: 16px;">Account Settings</div>
     </nav>
 
     <div class="container" style="padding: 20px;">
-        <div class="card" style="text-align: center; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; display: flex; flex-direction: column; align-items: center;">
+        <div class="card" style="text-align: center; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; display: flex; flex-direction: column; align-items: center; background: #1e293b;">
             
             <div style="position: relative; cursor: pointer;" onclick="document.getElementById('imageInput').click();">
-                <div id="avatarCircle" style="width: 90px; height: 90px; border-radius: 50%; background: #0f172a; border: 3px solid #38bdf8; display: flex; justify-content: center; align-items: center; overflow: hidden;">
+                <div id="avatarCircle" style="width: 90px; height: 90px; border-radius: 50%; background: #0c121e; border: 3px solid #38bdf8; display: flex; justify-content: center; align-items: center; overflow: hidden;">
                     <i id="profGenderIcon" class="fa-solid fa-venus-mars" style="font-size: 40px; color: #38bdf8;"></i>
                     <img id="profileView" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
                 </div>
@@ -37,37 +60,37 @@
             <span id="profPlan" class="vip-badge" style="background:#eab308; color:#000; padding:3px 12px; border-radius:12px; font-size:11px; font-weight: bold;">Free</span>
         </div>
 
-        <div class="card" style="padding: 20px; border-radius: 12px; text-align: left; margin-bottom: 20px;">
+        <div class="card" style="padding: 20px; border-radius: 12px; text-align: left; margin-bottom: 20px; background: #1e293b;">
             <h4 style="color: #fff; margin: 0 0 15px 0;"><i class="fa-solid fa-user-gear" style="color: #38bdf8; margin-right: 8px;"></i> Personal Details</h4>
             
             <label style="font-size: 12px; color: #38bdf8; margin-left: 5px;">Select Gender</label>
-            <select id="genderSelect" style="width: 100%; padding: 12px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 8px; margin-bottom: 15px;">
+            <select id="genderSelect" style="width: 100%; padding: 12px; background: #0c121e; border: 1px solid #334155; color: #fff; border-radius: 8px; margin-bottom: 15px;">
                 <option value="Not Set">Not Set</option>
                 <option value="Male">Male ♂</option>
                 <option value="Female">Female ♀</option>
                 <option value="Other">Other</option>
             </select>
 
-            <button id="saveProfileBtn" style="background: #22c55e; color: #fff; font-weight: bold;">
+            <button id="saveProfileBtn" style="width: 100%; padding: 12px; background: #22c55e; color: #fff; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;">
                 Save Profile Details
             </button>
         </div>
 
-        <div class="card" style="padding: 20px; border-radius: 12px; text-align: left;">
+        <div class="card" style="padding: 20px; border-radius: 12px; text-align: left; background: #1e293b;">
             <h4 style="color: #fff; margin: 0 0 15px 0;"><i class="fa-solid fa-key" style="color: #38bdf8; margin-right: 8px;"></i> Change Password</h4>
             
-            <label style="font-size: 12px; color: #38bdf8; margin-left: 5px;">Current Password</label>
-            <input type="password" id="currPass" placeholder="Enter current password">
+            <label style="font-size: 12px; color: #94a3b8; margin-left: 5px; display: block; margin-bottom: 5px;">Current Password</label>
+            <input type="password" id="currPass" class="profile-input" placeholder="Enter current password">
 
-            <label style="font-size: 12px; color: #38bdf8; margin-left: 5px;">New Password</label>
-            <input type="password" id="newPass" placeholder="Enter new password">
+            <label style="font-size: 12px; color: #94a3b8; margin-left: 5px; display: block; margin-bottom: 5px;">New Password</label>
+            <input type="password" id="newPass" class="profile-input" placeholder="Enter new password">
 
-            <button id="updatePassBtn" style="background: #38bdf8; color: #0f172a; font-weight: bold; margin-top: 10px;">
+            <button id="updatePassBtn" style="width: 100%; padding: 12px; background: #38bdf8; color: #0f172a; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; margin-top: 5px;">
                 Update Password
             </button>
         </div>
 
-        <button id="logoutBtn" style="background: #ef4444; color: #fff; font-weight: bold; margin-top: 20px; border: none;">
+        <button id="logoutBtn" style="width: 100%; padding: 12px; background: #ef4444; color: #fff; font-weight: bold; margin-top: 20px; border: none; border-radius: 8px; cursor: pointer;">
             <i class="fa-solid fa-right-from-bracket"></i> Logout Account
         </button>
     </div>
@@ -95,7 +118,6 @@
         } else {
             const userRef = ref(db, 'users/' + phone);
             
-            // Photo local storage load logic
             const savedPic = localStorage.getItem("userPic_" + phone);
             if(savedPic) {
                 document.getElementById("profileView").src = savedPic;
@@ -103,7 +125,6 @@
                 document.getElementById("profGenderIcon").style.display = "none";
             }
 
-            // Load Data from Firebase
             get(userRef).then((snapshot) => {
                 if(snapshot.exists()) {
                     const data = snapshot.val();
@@ -112,7 +133,6 @@
                     document.getElementById("profPlan").innerText = data.plan || "Free";
                     if(data.gender) { document.getElementById("genderSelect").value = data.gender; }
 
-                    // Save Profile (Gender) Logic
                     document.getElementById("saveProfileBtn").addEventListener("click", () => {
                         const gender = document.getElementById("genderSelect").value;
                         update(userRef, { gender: gender }).then(() => {
@@ -120,7 +140,6 @@
                         });
                     });
 
-                    // Password Update Logic
                     document.getElementById("updatePassBtn").addEventListener("click", () => {
                         const currPass = document.getElementById("currPass").value.trim();
                         const newPass = document.getElementById("newPass").value.trim();
@@ -137,7 +156,6 @@
                 document.getElementById("loader").style.display = "none";
             });
 
-            // Handle Local Image Upload
             document.getElementById("imageInput").addEventListener("change", function() {
                 const file = this.files[0];
                 if(file) {
@@ -153,7 +171,6 @@
                 }
             });
 
-            // Logout Logic
             document.getElementById("logoutBtn").addEventListener("click", () => {
                 localStorage.removeItem("currentUser");
                 window.location.href = 'login.html';
