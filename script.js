@@ -45,6 +45,10 @@ if (!phone) {
     window.location.href = "login.html";
 }
 
+// 6-digit Referral Code Generator for the current user
+const lastSixDigits = phone.toString().slice(-6);
+const myInstantCode = "EP-" + lastSixDigits;
+
 // Pakistani/Local Date Fetcher (Format: YYYY-MM-DD)
 const getTodayDateString = () => {
     const d = new Date();
@@ -65,7 +69,6 @@ userRef.on("value", (snapshot) => {
         // ⏰ 12:00 AM MIDNIGHT AUTO-REFRESH LOGIC
         if (lastTaskDate !== todayDate) {
             tasksDoneToday = 0;
-            // Database mein automatic counter refresh aur nai date lock karna
             userRef.update({
                 tasksDone: 0,
                 lastTaskDate: todayDate
@@ -73,47 +76,53 @@ userRef.on("value", (snapshot) => {
         } else {
             tasksDoneToday = parseInt(userData.tasksDone || 0);
         }
+
+        // --- نیا اسکیننگ سسٹم (Total Invites Count) ---
+        // اس بات کو یقینی بنائیں کہ آپ کے HTML میں "totalInvites" اور "permBonus" کی IDs موجود ہیں
+        if (document.getElementById("permBonus")) {
+            document.getElementById("permBonus").innerText = userData.bonusTasks || 0;
+        }
         
-        // =============================================================
+        if (!userData.myCode || userData.myCode !== myInstantCode) {
+            userRef.update({ myCode: myInstantCode });
+        }
+
+        db.ref("users").once("value", (allUsersSnapshot) => {
+            let count = 0;
+            allUsersSnapshot.forEach((childSnapshot) => {
+                const u = childSnapshot.val();
+                const referredByVal = u.referredBy ? u.referredBy.toString().trim() : "";
+                if (referredByVal === myInstantCode.trim()) {
+                    count++;
+                }
+            });
+            if(document.getElementById("totalInvites")) {
+                document.getElementById("totalInvites").innerText = count;
+            }
+        });
+        // ----------------------------------------------
+        
         // 🔥 ALL 4 INVESTMENT PLANS FIXED STRUCTURAL MATRIX
-        // =============================================================
         if (currentPlan === "Free") { 
-            totalLimit = 2; 
-            taskReward = 15; 
-            taskTime = 30; 
+            totalLimit = 2; taskReward = 15; taskTime = 30; 
         }
         else if (currentPlan.includes("Basic")) { 
-            totalLimit = 5;          // 5 Tasks Daily
-            taskReward = 30;         // Rs. 30 Per Task (Total Rs. 150)
-            taskTime = 25; 
+            totalLimit = 5; taskReward = 30; taskTime = 25; 
         }
         else if (currentPlan.includes("Standard")) { 
-            totalLimit = 7;          // 7 Tasks Daily
-            taskReward = 121;        // Rs. 121 Per Task (Total Rs. 847)
-            taskTime = 20; 
+            totalLimit = 7; taskReward = 121; taskTime = 20; 
         }
         else if (currentPlan.includes("Premium")) { 
-            totalLimit = 10;         // 10 Tasks Daily
-            taskReward = 220;        // Rs. 220 Per Task (Total Rs. 2200)
-            taskTime = 15;           
+            totalLimit = 10; taskReward = 220; taskTime = 15;           
         }
         else if (currentPlan.includes("Ultimate")) { 
-            totalLimit = 15;         // 15 Tasks Daily
-            taskReward = 513;        // Rs. 513 Per Task (Total Rs. 7695)
-            taskTime = 10;           
+            totalLimit = 15; taskReward = 513; taskTime = 10;           
         }
-        else { 
-            totalLimit = 2; 
-            taskReward = 15; 
-            taskTime = 30; 
-        }
-        // =============================================================
         
         // Updating Frontend Screen Elements Live
         if(document.getElementById("p-name")) document.getElementById("p-name").innerText = currentPlan + (currentPlan.includes("Plan") ? "" : " Plan");
         if(document.getElementById("t-count")) document.getElementById("t-count").innerText = "Tasks: " + tasksDoneToday + "/" + totalLimit;
         
-        // 🔥 FIXED VIDEO INJECTION: Is embed link mein aapki requested video ka ID set kar diya hai
         let vArea = document.getElementById("v-area");
         if (vArea) {
             vArea.innerHTML = `<p id="r-text" style="color: #38bdf8; font-size: 14px; font-weight: bold; margin-bottom: 10px;">Reward: Rs. ${taskReward}</p>
@@ -122,18 +131,14 @@ userRef.on("value", (snapshot) => {
     }
 });
 
-// START TASK CORE ENGINE (With Monetag Popunder Integration)
+// START TASK CORE ENGINE
 function start() {
-    // Intercept check to completely block limit bypass attempts
     if (tasksDoneToday >= totalLimit) {
-        alert("Aapki aaj ki daily task limit poori ho chuki hai! Raat 12 bje ke baad automatic refresh ho jayegi.");
+        alert("Aapki aaj ki daily task limit poori ho chuki hai!");
         return;
     }
-    
-    // Ads Activation Trigger
     window.open("https://omg10.com/4/11022523", "_blank");
 
-    // UI State Management (Hide Start, Show Countdowns)
     let sBtn = document.getElementById("s-btn");
     if(sBtn) sBtn.style.display = "none";
     
@@ -154,18 +159,10 @@ function start() {
 
 // SECURE CLAIM REWARD ENGINE
 function claim() {
-    if (tasksDoneToday >= totalLimit) {
-        alert("Daily task limit crossed!");
-        if(document.getElementById("c-btn")) document.getElementById("c-btn").style.display = "none";
-        if(document.getElementById("s-btn")) document.getElementById("s-btn").style.display = "block";
-        return;
-    }
-
     const newBalance = currentBalance + taskReward;
     const newTasksDone = tasksDoneToday + 1;
     const todayDate = getTodayDateString();
     
-    // Synchronizing finalized parameters directly to Firebase
     userRef.update({
         balance: newBalance,
         tasksDone: newTasksDone,
@@ -175,7 +172,5 @@ function claim() {
         if(document.getElementById("c-btn")) document.getElementById("c-btn").style.display = "none";
         if(document.getElementById("s-btn")) document.getElementById("s-btn").style.display = "block";
         if(document.getElementById("timer")) document.getElementById("timer").innerText = "Wait for Start";
-    }).catch((error) => {
-        alert("Firebase Sync Error: " + error.message);
     });
-            }
+}
