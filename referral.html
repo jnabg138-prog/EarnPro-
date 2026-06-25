@@ -51,15 +51,15 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
     <script>
-        // 1. Firebase Configuration
+        // 1. Firebase Configuration (Updated)
         const firebaseConfig = {
-            apiKey: "AIzaSyAsUq4BEYktF7gTHMB3zaJNX-ugdPVTfoo",
+            apiKey: "AIzaSyAxkoq0EY9xsF7gTthM3ZajNX-upWVTfmo",
             authDomain: "earnpro-14953.firebaseapp.com",
             databaseURL: "https://earnpro-14953-default-rtdb.firebaseio.com",
             projectId: "earnpro-14953",
-            storageBucket: "earnpro-14953.firebasestorage.app",
+            storageBucket: "earnpro-14953.appspot.com",
             messagingSenderId: "754662452601",
-            appId: "1:754662452601:web:0548a7ee79ffafc63f13a8"
+            appId: "1:754662452601:web:0548a7ee70ffa1c31f3ad7"
         };
 
         if (!firebase.apps.length) {
@@ -68,7 +68,7 @@
         const db = firebase.database();
 
         // 2. User Authentication Check
-        const phone = localStorage.getItem("userPhone") || localStorage.getItem("currentUser");
+        const phone = localStorage.getItem("currentUser") || localStorage.getItem("userPhone");
 
         if (!phone) {
             alert("Session expire ho gaya! Pehle login karein.");
@@ -95,7 +95,8 @@
                         let count = 0;
                         allUsersSnapshot.forEach((childSnapshot) => {
                             const u = childSnapshot.val();
-                            if (u.referredBy === myInstantCode) {
+                            const referredByVal = u.referredBy ? u.referredBy.toString().trim() : "";
+                            if (referredByVal === myInstantCode.trim()) {
                                 count++;
                             }
                         });
@@ -105,7 +106,7 @@
             });
         }
 
-        // 3. Smart Link Copy System (Handles Sub-folders and File Names perfectly)
+        // 3. Smart Link Copy System
         function copyRef() {
             const codeText = document.getElementById("myUniqueCode").innerText;
             if(codeText === "EP-LOADING") {
@@ -113,19 +114,14 @@
                 return;
             }
             
-            // Poora current URL lein (e.g., https://jnabg138-prog.github.io/EarnPro/refer.html)
             let currentUrl = window.location.href;
-            
-            // Agar URL ke aakhri mein query parameters hain (? se aagay) toh unhe saaf karein
             if (currentUrl.indexOf("?") > -1) {
                 currentUrl = currentUrl.split("?")[0];
             }
             
-            // Aakhri file ka naam nikal kar 'signup.html' se replace karein
             const lastSlashIndex = currentUrl.lastIndexOf("/");
             const basePath = currentUrl.substring(0, lastSlashIndex + 1);
             
-            // Final path tayar: Yeh aapki repository ke folders ko automatically sath jore rakhega
             const link = basePath + "signup.html?ref=" + codeText;
             
             if (navigator.clipboard) {
@@ -150,4 +146,4 @@
         }
     </script>
 </body>
-</html>
+    </html>
