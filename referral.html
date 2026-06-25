@@ -90,6 +90,7 @@
                         userRef.update({ myCode: myInstantCode });
                     }
 
+                    // Scan System: تمام یوزرز کو اسکین کر کے ٹوٹل انوائٹس کاؤنٹ کرنا
                     db.ref("users").once("value", (allUsersSnapshot) => {
                         let count = 0;
                         allUsersSnapshot.forEach((childSnapshot) => {
@@ -149,4 +150,4 @@
         }
     </script>
 </body>
-    </html>
+</html>
