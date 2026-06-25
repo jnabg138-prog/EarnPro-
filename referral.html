@@ -6,8 +6,8 @@
     <title>Refer & Earn - EarnPro</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
-        body { background: #0b1329; color: #c9d1d9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 30px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        body { background: #0b1329; color: #c9d1d9; display: flex; justify-content: center; min-height: 100vh; padding: 20px; }
+        .container { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 30px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin-top: 20px; }
         h2 { color: #38bdf8; margin-bottom: 25px; font-size: 24px; font-weight: 700; }
         .code-box { background: #0b1329; border: 2px dashed #334155; border-radius: 8px; padding: 20px; margin-bottom: 25px; transition: 0.3s; }
         .code-box:hover { border-color: #38bdf8; }
@@ -19,14 +19,14 @@
         .stat-card { background: #1e293b; border: 1px solid #334155; padding: 15px; border-radius: 10px; }
         .stat-card h3 { font-size: 24px; color: #38bdf8; margin-bottom: 5px; font-weight: 800; }
         .stat-card p { font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
-        .back-link { display: block; margin-top: 20px; color: #94a3b8; text-decoration: none; font-size: 14px; transition: 0.2s; }
+        .back-link { display: block; margin-top: 20px; color: #94a3b8; text-decoration: none; font-size: 14px; transition: 0.2s; text-align: left; margin-bottom: 10px; }
         .back-link:hover { color: #38bdf8; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <a href="index.html" class="back-link" style="text-align: left; margin-bottom: 10px; display: inline-block; width: 100%;">← Back to Dashboard</a>
+        <a href="index.html" class="back-link">← Back to Dashboard</a>
         <h2>Refer & Earn</h2>
         
         <div class="code-box">
@@ -51,7 +51,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
     <script>
-        // 1. Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAsUq4BEYktF7gTHMB3zaJNX-ugdPVTfoo",
             authDomain: "earnpro-14953.firebaseapp.com",
@@ -62,91 +61,39 @@
             appId: "1:754662452601:web:0548a7ee79ffafc63f13a8"
         };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
-        // 2. User Authentication Check
         const phone = localStorage.getItem("userPhone") || localStorage.getItem("currentUser");
 
         if (!phone) {
             alert("Session expire ho gaya! Pehle login karein.");
             window.location.href = "login.html";
         } else {
-            const lastSixDigits = phone.toString().slice(-6); 
-            const myInstantCode = "EP-" + lastSixDigits;
-            
-            document.getElementById("myUniqueCode").innerText = myInstantCode;
+            const myCode = "EP-" + phone.toString().slice(-6);
+            document.getElementById("myUniqueCode").innerText = myCode;
 
-            const userRef = db.ref("users/" + phone);
-            
-            userRef.on("value", (snapshot) => {
-                const user = snapshot.val();
-                if (user) {
-                    document.getElementById("permBonus").innerText = user.bonusTasks || 0;
-                    
-                    if (!user.myCode || user.myCode !== myInstantCode) {
-                        userRef.update({ myCode: myInstantCode });
+            // اسکیننگ سسٹم جو ٹوٹل انوائٹس اور بونس ٹاسک اپ ڈیٹ کرے گا
+            db.ref("users").on("value", (snapshot) => {
+                let count = 0;
+                snapshot.forEach((child) => {
+                    if (child.val().referredBy === myCode) {
+                        count++;
                     }
-
-                    db.ref("users").once("value", (allUsersSnapshot) => {
-                        let count = 0;
-                        allUsersSnapshot.forEach((childSnapshot) => {
-                            const u = childSnapshot.val();
-                            if (u.referredBy === myInstantCode) {
-                                count++;
-                            }
-                        });
-                        document.getElementById("totalInvites").innerText = count;
-                    });
-                }
+                });
+                
+                document.getElementById("totalInvites").innerText = count;
+                document.getElementById("permBonus").innerText = count * 2;
             });
         }
 
-        // 3. Smart Link Copy System (Handles Sub-folders and File Names perfectly)
         function copyRef() {
-            const codeText = document.getElementById("myUniqueCode").innerText;
-            if(codeText === "EP-LOADING") {
-                alert("Thora intezar karein, code load ho raha hai...");
-                return;
-            }
+            const code = document.getElementById("myUniqueCode").innerText;
+            const link = window.location.origin + "/signup.html?ref=" + code;
             
-            // Poora current URL lein (e.g., https://jnabg138-prog.github.io/EarnPro/refer.html)
-            let currentUrl = window.location.href;
-            
-            // Agar URL ke aakhri mein query parameters hain (? se aagay) toh unhe saaf karein
-            if (currentUrl.indexOf("?") > -1) {
-                currentUrl = currentUrl.split("?")[0];
-            }
-            
-            // Aakhri file ka naam nikal kar 'signup.html' se replace karein
-            const lastSlashIndex = currentUrl.lastIndexOf("/");
-            const basePath = currentUrl.substring(0, lastSlashIndex + 1);
-            
-            // Final path tayar: Yeh aapki repository ke folders ko automatically sath jore rakhega
-            const link = basePath + "signup.html?ref=" + codeText;
-            
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(link).then(() => {
-                    alert("Copy Ho Gaya! Apne doston ko invite karein:\n\n" + link);
-                }).catch(err => {
-                    fallbackCopy(link);
-                });
-            } else {
-                fallbackCopy(link);
-            }
-        }
-
-        function fallbackCopy(text) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            alert("Referral link copy ho gaya!");
+            navigator.clipboard.writeText(link).then(() => {
+                alert("Link copy ho gaya!");
+            });
         }
     </script>
 </body>
-    </html>
+</html>
