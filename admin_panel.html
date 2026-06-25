@@ -3,105 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EarnPro Super Admin - Premium Edition</title>
+    <title>EarnPro Super Admin - Final Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { 
-            --bg: #0b1329; 
-            --card: #0f172a; 
-            --border: #1e293b; 
-            --text: #f8fafc; 
-            --primary: #38bdf8; 
-            --danger: #ef4444; 
-            --success: #22c55e; 
-            --warning: #f59e0b; 
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 50px; }
-        
+        :root { --bg: #0b1329; --card: #0f172a; --border: #1e293b; --text: #f8fafc; --primary: #38bdf8; --danger: #ef4444; --success: #22c55e; --warning: #f59e0b; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 50px; font-family: 'Inter', sans-serif; }
         #adminAuth { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .auth-card { background: var(--card); padding: 40px; border-radius: 15px; border: 1px solid var(--border); width: 100%; max-width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        
+        .auth-card { background: var(--card); padding: 40px; border-radius: 15px; border: 1px solid var(--border); width: 100%; max-width: 400px; text-align: center; }
         .dashboard { display: none; padding: 20px; max-width: 1200px; margin: 0 auto; }
         .nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
-        
         .btn { padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 11px; margin-right: 5px; text-transform: uppercase; }
         .btn-success { background: var(--success); color: white; }
-        .btn-success:hover { background: #16a34a; }
         .btn-danger { background: var(--danger); color: white; }
-        .btn-danger:hover { background: #dc2626; }
         .btn-primary { background: var(--primary); color: #0f172a; }
-        
-        .table-container { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow-x: auto; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; }
-        th, td { padding: 14px 15px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
-        th { color: var(--primary); background: rgba(56, 189, 248, 0.05); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
-        tr:hover { background: rgba(255,255,255,0.02); }
-        
-        .section-title { margin: 30px 0 15px; display: flex; align-items: center; gap: 10px; color: var(--primary); border-left: 4px solid var(--primary); padding-left: 15px; font-size: 18px; font-weight: 700; }
-        .log-entry { font-family: 'Courier New', monospace; font-size: 12px; padding: 6px 0; border-bottom: 1px dotted var(--border); }
-        .log-time { color: #64748b; margin-right: 10px; }
-        
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; }
-        .badge-pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid var(--warning); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 12px; color: var(--primary); margin-bottom: 5px; font-weight: bold; }
+        input[type="number"], input[type="text"] { width: 100%; padding: 10px; background: #0b1329; border: 1px solid var(--border); color: white; border-radius: 6px; }
+        .table-container { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow-x: auto; margin-top: 20px; margin-bottom: 40px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--primary); }
     </style>
 </head>
 <body>
 
     <div id="adminAuth">
         <div class="auth-card">
-            <i class="fa-solid fa-lock" style="font-size: 40px; color: var(--primary); margin-bottom: 15px;"></i>
             <h2>Admin Security Login</h2>
-            <input type="password" id="adminPass" placeholder="Enter Secure Password..." style="width: 100%; margin: 20px 0; padding: 12px; border-radius: 8px; background: #0b1329; color: white; border: 1px solid var(--border); text-align: center; font-size: 16px;">
-            <button onclick="checkAdmin()" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 14px;">Unlock Dashboard</button>
+            <input type="password" id="adminPass" placeholder="Enter Password..." style="width: 100%; margin: 20px 0; padding: 12px; border-radius: 8px; background: #0b1329; color: white; border: 1px solid var(--border); text-align: center;">
+            <button onclick="checkAdmin()" class="btn btn-primary" style="width: 100%; padding: 12px;">Unlock</button>
         </div>
     </div>
 
     <div class="dashboard" id="mainDashboard">
         <div class="nav">
             <h2><i class="fa-solid fa-crown" style="color: var(--warning);"></i> EarnPro Master Admin</h2>
-            <button onclick="location.reload()" class="btn btn-danger"><i class="fa-solid fa-power-off"></i> Logout</button>
+            <button onclick="location.reload()" class="btn btn-danger">Logout</button>
         </div>
 
-        <h3 class="section-title"><i class="fa-solid fa-users"></i> Registered Users</h3>
+        <h3 style="color:var(--primary);">User Search & Manage</h3>
+        <div style="background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; gap: 10px;">
+            <input type="text" id="searchPhone" placeholder="Enter Phone Number...">
+            <button onclick="searchAndEdit()" class="btn btn-primary">Search User</button>
+        </div>
+
+        <div id="editSection" style="background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 20px; display: none; border: 1px solid var(--primary);">
+            <h3 style="color:var(--primary); margin-bottom:15px;">Edit Details: <span id="targetPhone"></span></h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group"><label>Balance (PKR)</label><input type="number" id="eBal"></div>
+                <div class="form-group"><label>Daily Tasks Limit</label><input type="number" id="eDaily"></div>
+                <div class="form-group"><label>Bonus Tasks</label><input type="number" id="eBonus"></div>
+                <div class="form-group"><label>Total Invites</label><input type="number" id="eInv"></div>
+                <div class="form-group"><label>Referral Bonus</label><input type="number" id="eRefBonus"></div>
+                <div class="form-group"><label>Team Size</label><input type="number" id="eTeam"></div>
+            </div>
+            <button onclick="saveChanges()" class="btn btn-success" style="width: 100%; padding: 12px; margin-top:10px;">Save All Changes</button>
+        </div>
+
+        <h3 style="color:var(--primary); margin-top:40px;">Pending Deposit Requests</h3>
         <div class="table-container">
-            <table id="usersTable">
-                <thead>
-                    <tr><th>Phone Number</th><th>Main Balance</th><th>Active Plan</th><th>Actions</th></tr>
-                </thead>
-                <tbody></tbody>
+            <table>
+                <thead><tr><th>Phone</th><th>Date/Time</th><th>TID</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="depositBody"></tbody>
             </table>
         </div>
 
-        <h3 class="section-title"><i class="fa-solid fa-wallet"></i> Pending Deposit Requests</h3>
+        <h3 style="color:var(--primary); margin-top:40px;">Pending Withdrawal Requests</h3>
         <div class="table-container">
-            <table id="depositTable">
-                <thead>
-                    <tr><th>User Phone</th><th>Amount (PKR)</th><th>Transaction ID (TrxID)</th><th>Time Submitted</th><th>Status</th><th>Actions</th></tr>
-                </thead>
-                <tbody></tbody>
+            <table>
+                <thead><tr><th>Phone</th><th>Date/Time</th><th>Acc Number</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="withdrawBody"></tbody>
             </table>
         </div>
 
-        <h3 class="section-title"><i class="fa-solid fa-money-bill-transfer"></i> Pending Withdrawal Requests</h3>
+        <h3 style="color:var(--primary); margin-top:40px;">Send Notifications</h3>
         <div class="table-container">
-            <table id="withdrawTable">
-                <thead>
-                    <tr><th>User Phone</th><th>Payment Method</th><th>Account Details</th><th>Amount</th><th>Status</th><th>Actions</th></tr>
-                </thead>
-                <tbody></tbody>
+            <table>
+                <thead><tr><th>User Phone</th><th>Notification Text</th><th>Action</th></tr></thead>
+                <tbody id="userListBody"></tbody>
             </table>
-        </div>
-
-        <h3 class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> Realtime System Logs</h3>
-        <div class="table-container" style="max-height: 250px; overflow-y: auto; padding: 15px; background: #070d19;">
-            <div id="logsContainer"></div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update, remove, get, push } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        import { getDatabase, ref, update, get, onValue, remove, set } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAsUq4BEYktF7gTHMB3zaJNX-ugdPVTfoo",
@@ -115,186 +101,94 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        let currentPhone = "";
 
-        window.checkAdmin = function() {
+        window.checkAdmin = () => {
             if(document.getElementById("adminPass").value === "786786") {
                 document.getElementById("adminAuth").style.display = "none";
                 document.getElementById("mainDashboard").style.display = "block";
-                loadRealtimeData();
-            } else { alert("Access Denied! Incorrect Password."); }
+                loadRequests();
+                loadUsersForNotif();
+            } else { alert("Wrong Password!"); }
         }
 
-        function saveLog(action) {
-            const logRef = ref(db, 'adminLogs');
-            push(logRef, {
-                action: action,
-                time: new Date().toLocaleString()
+        function loadRequests() {
+            onValue(ref(db, 'deposits/'), (snap) => {
+                const body = document.getElementById("depositBody");
+                body.innerHTML = "";
+                snap.forEach(child => {
+                    const req = child.val();
+                    body.innerHTML += `<tr><td>${req.phone}</td><td>${req.time}</td><td>${req.tid}</td><td>${req.amount}</td><td>Pending</td><td><button class="btn btn-success" onclick="approveDeposit('${child.key}', '${req.phone}', ${req.amount})">Accept</button><button class="btn btn-danger" onclick="remove(ref(db, 'deposits/${child.key}'))">Reject</button></td></tr>`;
+                });
+            });
+            onValue(ref(db, 'withdrawals/'), (snap) => {
+                const body = document.getElementById("withdrawBody");
+                body.innerHTML = "";
+                snap.forEach(child => {
+                    const req = child.val();
+                    body.innerHTML += `<tr><td>${req.phone}</td><td>${req.time}</td><td>${req.accountNumber}</td><td>${req.amount}</td><td>Pending</td><td><button class="btn btn-success" onclick="remove(ref(db, 'withdrawals/${child.key}'))">Paid</button><button class="btn btn-danger" onclick="remove(ref(db, 'withdrawals/${child.key}'))">Reject</button></td></tr>`;
+                });
             });
         }
 
-        function loadRealtimeData() {
-            // Live Users Connection
-            onValue(ref(db, 'users'), (snap) => {
-                const tbody = document.querySelector("#usersTable tbody");
-                tbody.innerHTML = "";
+        function loadUsersForNotif() {
+            onValue(ref(db, 'users/'), (snap) => {
+                const body = document.getElementById("userListBody");
+                body.innerHTML = "";
                 snap.forEach(child => {
-                    const user = child.val();
-                    tbody.innerHTML += `<tr>
-                        <td><b>${child.key}</b></td>
-                        <td style="color:var(--success)"><b>Rs. ${user.balance || 0}</b></td>
-                        <td><span style="color:var(--primary)">${user.plan || 'Free Plan'}</span></td>
-                        <td><button onclick="editBalance('${child.key}')" class="btn btn-primary"><i class="fa-solid fa-pen-to-square"></i> Edit Balance</button></td>
+                    const phone = child.key;
+                    body.innerHTML += `<tr>
+                        <td>${phone}</td>
+                        <td><input type="text" id="notif_${phone}" placeholder="Enter message..."></td>
+                        <td><button class="btn btn-primary" onclick="sendNotif('${phone}')">Submit</button></td>
                     </tr>`;
                 });
             });
+        }
 
-            // Live Logs Connection
-            onValue(ref(db, 'adminLogs'), (snap) => {
-                const container = document.getElementById("logsContainer");
-                container.innerHTML = "";
-                const logs = [];
-                snap.forEach(child => logs.push(child.val()));
-                logs.reverse().forEach(log => {
-                    container.innerHTML += `<div class="log-entry"><span class="log-time">[${log.time}]</span> ${log.action}</div>`;
-                });
-            });
+        window.sendNotif = (phone) => {
+            const msg = document.getElementById(`notif_${phone}`).value;
+            if(!msg) return alert("Enter message!");
+            set(ref(db, 'notifications/' + phone), { text: msg, status: 'unread' });
+            alert("Notification Sent!");
+        }
 
-            // Live Deposits Connection (NEW)
-            onValue(ref(db, 'deposits'), (snap) => {
-                const tbody = document.querySelector("#depositTable tbody");
-                tbody.innerHTML = "";
-                snap.forEach(child => {
-                    const dep = child.val();
-                    if(dep.status === "Pending") {
-                        tbody.innerHTML += `<tr>
-                            <td>${dep.phone}</td>
-                            <td style="color:var(--success); font-weight:bold;">Rs. ${dep.amount}</td>
-                            <td><code style="background:#1e293b; padding:4px 8px; border-radius:4px;">${dep.trxId}</code></td>
-                            <td>${dep.time}</td>
-                            <td><span class="badge badge-pending">Pending</span></td>
-                            <td>
-                                <button onclick="handleDeposit('${child.key}', 'Approve')" class="btn btn-success"><i class="fa-solid fa-check"></i> Approve</button>
-                                <button onclick="handleDeposit('${child.key}', 'Reject')" class="btn btn-danger"><i class="fa-solid fa-xmark"></i> Reject</button>
-                            </td>
-                        </tr>`;
-                    }
-                });
-                if(tbody.innerHTML === "") { tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; color:#64748b;'>No pending deposits found.</td></tr>"; }
-            });
-
-            // Live Withdrawals Connection (UPDATED WITH APPROVE/REJECT)
-            onValue(ref(db, 'withdrawRequests'), (snap) => {
-                const tbody = document.querySelector("#withdrawTable tbody");
-                tbody.innerHTML = "";
-                snap.forEach(child => {
-                    const item = child.val();
-                    tbody.innerHTML += `<tr>
-                        <td>${item.phone}</td>
-                        <td><span style="color:var(--primary); font-weight:600;">${item.method}</span></td>
-                        <td>${item.number || 'N/A'}</td>
-                        <td style="color:var(--danger); font-weight:bold;">Rs. ${item.amount}</td>
-                        <td><span class="badge badge-pending">Pending</span></td>
-                        <td>
-                            <button onclick="handleWithdraw('${child.key}', 'Approve')" class="btn btn-success"><i class="fa-solid fa-check"></i> Done</button>
-                            <button onclick="handleWithdraw('${child.key}', 'Reject')" class="btn btn-danger"><i class="fa-solid fa-xmark"></i> Reject</button>
-                        </td>
-                    </tr>`;
-                });
-                if(tbody.innerHTML === "") { tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; color:#64748b;'>No pending withdrawals found.</td></tr>"; }
+        window.approveDeposit = (key, phone, amount) => {
+            get(ref(db, 'users/' + phone)).then(snap => {
+                const currentBal = parseInt(snap.val().balance || 0);
+                update(ref(db, 'users/' + phone), { balance: currentBal + amount });
+                remove(ref(db, 'deposits/' + key));
+                alert("Approved Successfully!");
             });
         }
 
-        // EDIT BALANCE FUNCTION
-        window.editBalance = function(phone) {
-            const newBal = prompt("Enter new balance for " + phone);
-            if(newBal !== null && newBal !== "") {
-                update(ref(db, 'users/' + phone), { balance: parseInt(newBal) })
-                .then(() => saveLog(`Manual Balance Update: ${phone} balance set to Rs. ${newBal}`));
-            }
-        }
-
-        // DEPOSIT ACTION LOGIC (APPROVE / REJECT)
-        window.handleDeposit = function(key, action) {
-            get(ref(db, 'deposits/' + key)).then(snap => {
-                if(!snap.exists()) return;
-                const data = snap.val();
-                const userPhone = data.phone;
-                const amount = parseInt(data.amount);
-
-                if (action === "Approve") {
-                    // Step A: User node se current balance uthana aur add karna
-                    get(ref(db, 'users/' + userPhone)).then(userSnap => {
-                        let currentBalance = 0;
-                        let currentPlan = "Basic";
-                        if(userSnap.exists()){
-                            currentBalance = userSnap.val().balance || 0;
-                        }
-                        
-                        // Plan determine karna based on deposit amount
-                        if(amount >= 2000) currentPlan = "Premium";
-
-                        const newBalance = currentBalance + amount;
-
-                        // Step B: User ka balance aur plan update karna
-                        update(ref(db, 'users/' + userPhone), { 
-                            balance: newBalance,
-                            plan: currentPlan
-                        }).then(() => {
-                            // Step C: History update & Clean requests
-                            updateHistoryAndRemoveRequest('deposits', key, userPhone, 'Approved', data);
-                            saveLog(`Deposit Approved: Rs. ${amount} added to ${userPhone}. Plan set to ${currentPlan}`);
-                        });
-                    });
-                } else {
-                    // Reject Logic
-                    updateHistoryAndRemoveRequest('deposits', key, userPhone, 'Rejected', data);
-                    saveLog(`Deposit Rejected: TrxID ${data.trxId} for ${userPhone}`);
-                }
+        window.searchAndEdit = () => {
+            const phone = document.getElementById("searchPhone").value;
+            get(ref(db, 'users/' + phone)).then(snap => {
+                if(!snap.exists()) return alert("User not found!");
+                const u = snap.val();
+                currentPhone = phone;
+                document.getElementById("targetPhone").innerText = phone;
+                document.getElementById("eBal").value = u.balance || 0;
+                document.getElementById("eDaily").value = u.dailyTasks || 0; 
+                document.getElementById("eBonus").value = u.bonusTasks || 0;
+                document.getElementById("eInv").value = u.totalInvites || 0;
+                document.getElementById("eRefBonus").value = u.referralBonus || 0;
+                document.getElementById("eTeam").value = u.teamSize || 0;
+                document.getElementById("editSection").style.display = "block";
             });
         }
 
-        // WITHDRAW ACTION LOGIC (DONE / REJECT)
-        window.handleWithdraw = function(key, action) {
-            get(ref(db, 'withdrawRequests/' + key)).then(snap => {
-                if(!snap.exists()) return;
-                const data = snap.val();
-                const userPhone = data.phone;
-                const amount = parseInt(data.amount);
-
-                if(action === "Approve") {
-                    // Approve execution
-                    updateHistoryAndRemoveRequest('withdrawRequests', key, userPhone, 'Completed', data);
-                    saveLog(`Withdraw Approved: Rs. ${amount} sent to ${userPhone}`);
-                } else {
-                    // Reject execution: User ko paise wapis return karna balance mein
-                    get(ref(db, 'users/' + userPhone)).then(userSnap => {
-                        let currentBalance = 0;
-                        if(userSnap.exists()){ currentBalance = userSnap.val().balance || 0; }
-                        
-                        update(ref(db, 'users/' + userPhone), { balance: currentBalance + amount })
-                        .then(() => {
-                            updateHistoryAndRemoveRequest('withdrawRequests', key, userPhone, 'Rejected', data);
-                            saveLog(`Withdraw Rejected: Rs. ${amount} refunded to ${userPhone}`);
-                        });
-                    });
-                }
-            });
-        }
-
-        // HELPER: Sync history node and remove pending data safely
-        function updateHistoryAndRemoveRequest(nodePath, key, phone, finalStatus, data) {
-            data.status = finalStatus;
-            
-            // 1. Archives node update karna (Global records)
-            const historyNode = nodePath === 'deposits' ? 'depositHistory' : 'withdrawHistory';
-            update(ref(db, `${historyNode}/${key}`), data);
-
-            // 2. User ki apni private personal transaction history update karna
-            update(ref(db, `history/${phone}/${key}`), { status: finalStatus });
-
-            // 3. Pending requests node se remove karna
-            remove(ref(db, `${nodePath}/${key}`));
+        window.saveChanges = () => {
+            update(ref(db, 'users/' + currentPhone), { 
+                balance: parseInt(document.getElementById("eBal").value),
+                dailyTasks: parseInt(document.getElementById("eDaily").value),
+                bonusTasks: parseInt(document.getElementById("eBonus").value),
+                totalInvites: parseInt(document.getElementById("eInv").value),
+                referralBonus: parseInt(document.getElementById("eRefBonus").value),
+                teamSize: parseInt(document.getElementById("eTeam").value)
+            }).then(() => { alert("Updated Successfully!"); });
         }
     </script>
 </body>
-    </html>
+</html>
