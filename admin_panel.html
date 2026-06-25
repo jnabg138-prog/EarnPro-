@@ -23,6 +23,7 @@
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
         th { color: var(--primary); }
+        .no-data { text-align: center; padding: 20px; color: var(--primary); font-weight: bold; }
     </style>
 </head>
 <body>
@@ -71,7 +72,7 @@
         <h3 style="color:var(--primary); margin-top:40px;">Pending Withdrawal Requests</h3>
         <div class="table-container">
             <table>
-                <thead><tr><th>Phone</th><th>Date/Time</th><th>Acc Number</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+                <thead><tr><th>Phone</th><th>Date/Time</th><th>Number</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
                 <tbody id="withdrawBody"></tbody>
             </table>
         </div>
@@ -116,18 +117,29 @@
             onValue(ref(db, 'deposits/'), (snap) => {
                 const body = document.getElementById("depositBody");
                 body.innerHTML = "";
+                let count = 0;
                 snap.forEach(child => {
                     const req = child.val();
-                    body.innerHTML += `<tr><td>${req.phone}</td><td>${req.time}</td><td>${req.tid}</td><td>${req.amount}</td><td>Pending</td><td><button class="btn btn-success" onclick="approveDeposit('${child.key}', '${req.phone}', ${req.amount})">Accept</button><button class="btn btn-danger" onclick="remove(ref(db, 'deposits/${child.key}'))">Reject</button></td></tr>`;
+                    if(req.phone && req.time && req.tid && req.amount) {
+                        body.innerHTML += `<tr><td>${req.phone}</td><td>${req.time}</td><td>${req.tid}</td><td>${req.amount}</td><td>Pending</td><td><button class="btn btn-success" onclick="approveDeposit('${child.key}', '${req.phone}', ${req.amount})">Accept</button><button class="btn btn-danger" onclick="remove(ref(db, 'deposits/${child.key}'))">Reject</button></td></tr>`;
+                        count++;
+                    }
                 });
+                if(count === 0) body.innerHTML = "<tr><td colspan='6' class='no-data'>No more requests</td></tr>";
             });
-            onValue(ref(db, 'withdrawals/'), (snap) => {
+
+            onValue(ref(db, 'withdrawRequests/'), (snap) => {
                 const body = document.getElementById("withdrawBody");
                 body.innerHTML = "";
+                let count = 0;
                 snap.forEach(child => {
                     const req = child.val();
-                    body.innerHTML += `<tr><td>${req.phone}</td><td>${req.time}</td><td>${req.accountNumber}</td><td>${req.amount}</td><td>Pending</td><td><button class="btn btn-success" onclick="remove(ref(db, 'withdrawals/${child.key}'))">Paid</button><button class="btn btn-danger" onclick="remove(ref(db, 'withdrawals/${child.key}'))">Reject</button></td></tr>`;
+                    if(req.status === "Pending") {
+                        body.innerHTML += `<tr><td>${req.phone || 'N/A'}</td><td>${req.date || 'N/A'}</td><td>${req.number || 'N/A'}</td><td>${req.amount || 0}</td><td>${req.status}</td><td><button class="btn btn-success" onclick="remove(ref(db, 'withdrawRequests/${child.key}'))">Paid</button><button class="btn btn-danger" onclick="remove(ref(db, 'withdrawRequests/${child.key}'))">Reject</button></td></tr>`;
+                        count++;
+                    }
                 });
+                if(count === 0) body.innerHTML = "<tr><td colspan='6' class='no-data'>No more requests</td></tr>";
             });
         }
 
@@ -135,14 +147,13 @@
             onValue(ref(db, 'users/'), (snap) => {
                 const body = document.getElementById("userListBody");
                 body.innerHTML = "";
-                snap.forEach(child => {
-                    const phone = child.key;
-                    body.innerHTML += `<tr>
-                        <td>${phone}</td>
-                        <td><input type="text" id="notif_${phone}" placeholder="Enter message..."></td>
-                        <td><button class="btn btn-primary" onclick="sendNotif('${phone}')">Submit</button></td>
-                    </tr>`;
-                });
+                if(snap.exists()){
+                    snap.forEach(child => {
+                        const phone = child.key;
+                        // یہاں مکمل لسٹ شو ہو رہی ہے
+                        body.innerHTML += `<tr><td>${phone}</td><td><input type="text" id="notif_${phone}" placeholder="Enter message..."></td><td><button class="btn btn-primary" onclick="sendNotif('${phone}')">Submit</button></td></tr>`;
+                    });
+                }
             });
         }
 
@@ -155,10 +166,12 @@
 
         window.approveDeposit = (key, phone, amount) => {
             get(ref(db, 'users/' + phone)).then(snap => {
-                const currentBal = parseInt(snap.val().balance || 0);
-                update(ref(db, 'users/' + phone), { balance: currentBal + amount });
-                remove(ref(db, 'deposits/' + key));
-                alert("Approved Successfully!");
+                if(snap.exists()){
+                    const currentBal = parseInt(snap.val().balance || 0);
+                    update(ref(db, 'users/' + phone), { balance: currentBal + amount });
+                    remove(ref(db, 'deposits/' + key));
+                    alert("Approved Successfully!");
+                }
             });
         }
 
@@ -191,4 +204,4 @@
         }
     </script>
 </body>
-</html>
+                                                                        </html>
