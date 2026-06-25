@@ -6,8 +6,8 @@
     <title>Refer & Earn - EarnPro</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
-        body { background: #0b1329; color: #c9d1d9; display: flex; justify-content: center; min-height: 100vh; padding: 20px; }
-        .container { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 30px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin-top: 20px; }
+        body { background: #0b1329; color: #c9d1d9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 30px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         h2 { color: #38bdf8; margin-bottom: 25px; font-size: 24px; font-weight: 700; }
         .code-box { background: #0b1329; border: 2px dashed #334155; border-radius: 8px; padding: 20px; margin-bottom: 25px; transition: 0.3s; }
         .code-box:hover { border-color: #38bdf8; }
@@ -19,14 +19,14 @@
         .stat-card { background: #1e293b; border: 1px solid #334155; padding: 15px; border-radius: 10px; }
         .stat-card h3 { font-size: 24px; color: #38bdf8; margin-bottom: 5px; font-weight: 800; }
         .stat-card p { font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
-        .back-link { display: block; margin-top: 20px; color: #94a3b8; text-decoration: none; font-size: 14px; transition: 0.2s; text-align: left; margin-bottom: 10px; }
+        .back-link { display: block; margin-top: 20px; color: #94a3b8; text-decoration: none; font-size: 14px; transition: 0.2s; }
         .back-link:hover { color: #38bdf8; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <a href="index.html" class="back-link">← Back to Dashboard</a>
+        <a href="index.html" class="back-link" style="text-align: left; margin-bottom: 10px; display: inline-block; width: 100%;">← Back to Dashboard</a>
         <h2>Refer & Earn</h2>
         
         <div class="code-box">
@@ -66,23 +66,28 @@
         const phone = localStorage.getItem("userPhone") || localStorage.getItem("currentUser");
 
         if (!phone) {
-            alert("Session expire ho gaya! Pehle login karein.");
             window.location.href = "login.html";
         } else {
             const myCode = "EP-" + phone.toString().slice(-6);
             document.getElementById("myUniqueCode").innerText = myCode;
 
-            // اسکیننگ سسٹم جو ٹوٹل انوائٹس اور بونس ٹاسک اپ ڈیٹ کرے گا
+            // یہ فنکشن پورے ڈیٹا بیس کو اسکین کرے گا
             db.ref("users").on("value", (snapshot) => {
-                let count = 0;
-                snapshot.forEach((child) => {
-                    if (child.val().referredBy === myCode) {
-                        count++;
+                let inviteCount = 0;
+                
+                snapshot.forEach((childSnapshot) => {
+                    const userData = childSnapshot.val();
+                    // یہاں ہم چیک کر رہے ہیں کہ کس کا 'referredBy' ہمارے کوڈ کے برابر ہے
+                    if (userData.referredBy === myCode) {
+                        inviteCount++;
                     }
                 });
+
+                // UI کو اپ ڈیٹ کریں
+                document.getElementById("totalInvites").innerText = inviteCount;
                 
-                document.getElementById("totalInvites").innerText = count;
-                document.getElementById("permBonus").innerText = count * 2;
+                // اگر آپ بونس ٹاسک بھی خود کار کرنا چاہیں تو یہاں کر سکتے ہیں
+                // مثلاً: document.getElementById("permBonus").innerText = inviteCount * 2;
             });
         }
 
@@ -90,9 +95,11 @@
             const code = document.getElementById("myUniqueCode").innerText;
             const link = window.location.origin + "/signup.html?ref=" + code;
             
-            navigator.clipboard.writeText(link).then(() => {
-                alert("Link copy ho gaya!");
-            });
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(link).then(() => {
+                    alert("Referral link copy ho gaya!");
+                });
+            }
         }
     </script>
 </body>
