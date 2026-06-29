@@ -51,7 +51,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
     <script>
-        // 1. Firebase Configuration (Updated)
         const firebaseConfig = {
             apiKey: "AIzaSyAxkoq0EY9xsF7gTthM3ZajNX-upWVTfmo",
             authDomain: "earnpro-14953.firebaseapp.com",
@@ -62,88 +61,54 @@
             appId: "1:754662452601:web:0548a7ee70ffa1c31f3ad7"
         };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
-        // 2. User Authentication Check
         const phone = localStorage.getItem("currentUser") || localStorage.getItem("userPhone");
 
         if (!phone) {
-            alert("Session expire ho gaya! Pehle login karein.");
             window.location.href = "login.html";
         } else {
             const lastSixDigits = phone.toString().slice(-6); 
             const myInstantCode = "EP-" + lastSixDigits;
-            
             document.getElementById("myUniqueCode").innerText = myInstantCode;
 
-            const userRef = db.ref("users/" + phone);
-            
-            userRef.on("value", (snapshot) => {
-                const user = snapshot.val();
+            // User Info Load
+            db.ref("users/" + phone).on("value", (snap) => {
+                const user = snap.val();
                 if (user) {
                     document.getElementById("permBonus").innerText = user.bonusTasks || 0;
-                    
-                    if (!user.myCode || user.myCode !== myInstantCode) {
-                        userRef.update({ myCode: myInstantCode });
-                    }
-
-                    // Scan System: تمام یوزرز کو اسکین کر کے ٹوٹل انوائٹس کاؤنٹ کرنا
-                    db.ref("users").once("value", (allUsersSnapshot) => {
-                        let count = 0;
-                        allUsersSnapshot.forEach((childSnapshot) => {
-                            const u = childSnapshot.val();
-                            const referredByVal = u.referredBy ? u.referredBy.toString().trim() : "";
-                            if (referredByVal === myInstantCode.trim()) {
-                                count++;
-                            }
-                        });
-                        document.getElementById("totalInvites").innerText = count;
-                    });
                 }
+            });
+
+            // Count Refreshes System: یہ فنکشن ہر بار جب 'users' میں کوئی نیا بندہ آئے گا، خود بخود کاؤنٹ کرے گا
+            db.ref("users").on("value", (allUsersSnapshot) => {
+                let count = 0;
+                allUsersSnapshot.forEach((child) => {
+                    const u = child.val();
+                    if (u.referredBy && u.referredBy.toString().trim() === myInstantCode.trim()) {
+                        count++;
+                    }
+                });
+                document.getElementById("totalInvites").innerText = count;
+                
+                // Optional: آپ اسے ڈیٹا بیس میں بھی سیو کر سکتے ہیں تاکہ بار بار اسکین نہ کرنا پڑے
+                db.ref("users/" + phone).update({ totalInvites: count });
             });
         }
 
-        // 3. Smart Link Copy System
         function copyRef() {
             const codeText = document.getElementById("myUniqueCode").innerText;
-            if(codeText === "EP-LOADING") {
-                alert("Thora intezar karein, code load ho raha hai...");
-                return;
-            }
-            
-            let currentUrl = window.location.href;
-            if (currentUrl.indexOf("?") > -1) {
-                currentUrl = currentUrl.split("?")[0];
-            }
-            
-            const lastSlashIndex = currentUrl.lastIndexOf("/");
-            const basePath = currentUrl.substring(0, lastSlashIndex + 1);
-            
-            const link = basePath + "signup.html?ref=" + codeText;
+            const link = window.location.origin + "/signup.html?ref=" + codeText;
             
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(link).then(() => {
-                    alert("Copy Ho Gaya! Apne doston ko invite karein:\n\n" + link);
-                }).catch(err => {
-                    fallbackCopy(link);
+                    alert("Link Copy Ho Gaya!");
                 });
             } else {
-                fallbackCopy(link);
+                alert("Link: " + link);
             }
-        }
-
-        function fallbackCopy(text) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            alert("Referral link copy ho gaya!");
         }
     </script>
 </body>
-    </html>
+</html>
