@@ -1,4 +1,4 @@
-// =====================================================================
+ // =====================================================================
 // 1. ADVERTICA GLOBAL POPUNDER INJECTION ENGINE (Safe Window Load)
 // =====================================================================
 window.addEventListener('DOMContentLoaded', function() {
@@ -78,7 +78,7 @@ userRef.on("value", (snapshot) => {
         }
 
         // --- نیا اسکیننگ سسٹم (Total Invites Count) ---
-        // اس بات کو یقینی بنائیں کہ آپ کے HTML میں "totalInvites" اور "permBonus" کی IDs موجود ہیں
+        // اس بات کو یقینی بنائیں کہ آپ کے HTML میں "totalInvites" اور "permBonus" ki IDs موجود ہیں
         if (document.getElementById("permBonus")) {
             document.getElementById("permBonus").innerText = userData.bonusTasks || 0;
         }
@@ -126,7 +126,7 @@ userRef.on("value", (snapshot) => {
         let vArea = document.getElementById("v-area");
         if (vArea) {
             vArea.innerHTML = `<p id="r-text" style="color: #38bdf8; font-size: 14px; font-weight: bold; margin-bottom: 10px;">Reward: Rs. ${taskReward}</p>
-            <iframe src="https://youtu.be/LjLCO0o9-jU?si=kQQaylDrektGU7-h"></iframe>`;
+            <iframe src="https://www.youtube.com/embed/5mD8t76f578"></iframe>`;
         }
     }
 });
@@ -173,4 +173,4 @@ function claim() {
         if(document.getElementById("s-btn")) document.getElementById("s-btn").style.display = "block";
         if(document.getElementById("timer")) document.getElementById("timer").innerText = "Wait for Start";
     });
-}
+        }
