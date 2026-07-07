@@ -126,7 +126,7 @@ userRef.on("value", (snapshot) => {
         let vArea = document.getElementById("v-area");
         if (vArea) {
             vArea.innerHTML = `<p id="r-text" style="color: #38bdf8; font-size: 14px; font-weight: bold; margin-bottom: 10px;">Reward: Rs. ${taskReward}</p>
-            <iframe src="https://www.youtube.com/embed/FOlcoz_3TPY"></iframe>`;
+            <iframe src="https://youtu.be/LjLCO0o9-jU?si=kQQaylDrektGU7-h"></iframe>`;
         }
     }
 });
