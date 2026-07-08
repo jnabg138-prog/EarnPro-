@@ -130,6 +130,36 @@ userRef.on("value", (snapshot) => {
     }
 });
 
+// 🔔 ریئل ٹائم نوٹیفکیشن لیسنر (Live Notification Monitor)
+const notifRef = db.ref("notifications/" + phone);
+notifRef.on("value", (snapshot) => {
+    const notifBadge = document.getElementById("notif-badge"); // اپنے HTML میں نوٹیفکیشن آئیکن/بٹن کو یہ ID 'notif-badge' دیں
+    
+    if (snapshot.exists()) {
+        const notifData = snapshot.val();
+        
+        // اگر ڈیش بورڈ پر نوٹیفکیشن کا آئیکن یا بٹن موجود ہے تو اسے شو کر دیں
+        if (notifBadge) {
+            notifBadge.style.display = "block"; 
+            
+            // جب یوزر نوٹیفکیشن پر کلک کرے گا
+            notifBadge.onclick = function() {
+                alert("🔔 Admin Notification:\n\n" + notifData.text);
+                
+                // ایک بار پڑھنے کے بعد ڈیٹا بیس سے ہمیشہ کے لیے ڈیلیٹ کر دیں
+                notifRef.remove().then(() => {
+                    notifBadge.style.display = "none"; // اسکرین سے بھی غائب ہو جائے گا
+                });
+            };
+        }
+    } else {
+        // اگر کوئی نوٹیفکیشن موجود نہیں ہے تو بٹن چھپا رہے گا
+        if (notifBadge) {
+            notifBadge.style.display = "none";
+        }
+    }
+});
+
 // START TASK CORE ENGINE
 function start() {
     if (tasksDoneToday >= totalLimit) {
