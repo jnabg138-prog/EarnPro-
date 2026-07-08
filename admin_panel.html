@@ -58,6 +58,15 @@
                 <div class="form-group"><label>Referral Bonus</label><input type="number" id="eRefBonus"></div>
                 <div class="form-group"><label>Team Size</label><input type="number" id="eTeam"></div>
             </div>
+            
+            <div class="form-group" style="margin-top: 15px; grid-column: span 2;">
+                <label>Send User Notification (Shows on Dashboard)</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="uNotif" placeholder="Enter notification message for this user...">
+                    <button onclick="sendUserNotification()" class="btn btn-primary" style="white-space: nowrap;">Send Msg</button>
+                </div>
+            </div>
+
             <button onclick="saveChanges()" class="btn btn-success" style="width: 100%; padding: 12px; margin-top:10px;">Save All Changes</button>
         </div>
 
@@ -74,14 +83,6 @@
             <table>
                 <thead><tr><th>Phone</th><th>Date/Time</th><th>Number</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
                 <tbody id="withdrawBody"></tbody>
-            </table>
-        </div>
-
-        <h3 style="color:var(--primary); margin-top:40px;">Send Notifications</h3>
-        <div class="table-container">
-            <table>
-                <thead><tr><th>User Phone</th><th>Notification Text</th><th>Action</th></tr></thead>
-                <tbody id="userListBody"></tbody>
             </table>
         </div>
     </div>
@@ -109,7 +110,6 @@
                 document.getElementById("adminAuth").style.display = "none";
                 document.getElementById("mainDashboard").style.display = "block";
                 loadRequests();
-                loadUsersForNotif();
             } else { alert("Wrong Password!"); }
         }
 
@@ -143,27 +143,6 @@
             });
         }
 
-        function loadUsersForNotif() {
-            onValue(ref(db, 'users/'), (snap) => {
-                const body = document.getElementById("userListBody");
-                body.innerHTML = "";
-                if(snap.exists()){
-                    snap.forEach(child => {
-                        const phone = child.key;
-                        // یہاں مکمل لسٹ شو ہو رہی ہے
-                        body.innerHTML += `<tr><td>${phone}</td><td><input type="text" id="notif_${phone}" placeholder="Enter message..."></td><td><button class="btn btn-primary" onclick="sendNotif('${phone}')">Submit</button></td></tr>`;
-                    });
-                }
-            });
-        }
-
-        window.sendNotif = (phone) => {
-            const msg = document.getElementById(`notif_${phone}`).value;
-            if(!msg) return alert("Enter message!");
-            set(ref(db, 'notifications/' + phone), { text: msg, status: 'unread' });
-            alert("Notification Sent!");
-        }
-
         window.approveDeposit = (key, phone, amount) => {
             get(ref(db, 'users/' + phone)).then(snap => {
                 if(snap.exists()){
@@ -188,7 +167,28 @@
                 document.getElementById("eInv").value = u.totalInvites || 0;
                 document.getElementById("eRefBonus").value = u.referralBonus || 0;
                 document.getElementById("eTeam").value = u.teamSize || 0;
+                
+                // پرانا نوٹیفکیشن اگر موجود ہو تو لوڈ کریں
+                get(ref(db, 'notifications/' + phone)).then(notifSnap => {
+                    if(notifSnap.exists()){
+                        document.getElementById("uNotif").value = notifSnap.val().text || "";
+                    } else {
+                        document.getElementById("uNotif").value = "";
+                    }
+                });
+
                 document.getElementById("editSection").style.display = "block";
+            });
+        }
+
+        window.sendUserNotification = () => {
+            const msg = document.getElementById("uNotif").value;
+            if(!msg) return alert("Enter message!");
+            set(ref(db, 'notifications/' + currentPhone), {
+                text: msg,
+                status: 'unread'
+            }).then(() => {
+                alert("Notification Sent Successfully!");
             });
         }
 
@@ -204,4 +204,4 @@
         }
     </script>
 </body>
-                                                                        </html>
+                </html>
