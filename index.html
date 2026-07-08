@@ -20,7 +20,6 @@
         <i class="fa-solid fa-circle-notch fa-spin" style="margin-right: 10px;"></i> Loading Data...
     </div>
 
-    <!-- Navbar -->
     <nav class="navbar" style="display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; background: #0c121e; border-bottom: 1px solid #1e293b;">
         <div style="display: flex; align-items: center; gap: 12px;">
             <div id="profileCircle" onclick="window.location.href='profile.html'" style="width: 50px; height: 50px; border-radius: 50%; background: #1e293b; border: 2px solid #38bdf8; display: flex; justify-content: center; align-items: center; cursor: pointer; overflow: hidden; box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);">
@@ -32,8 +31,9 @@
                 <div id="userPlan" class="vip-badge" style="background:#38bdf8; color:#000; padding:1px 8px; border-radius:10px; font-size:10px; font-weight: bold; text-transform: uppercase; align-self: flex-start;">Free</div>
             </div>
         </div>
-        <div style="cursor: pointer; color: #fff; font-size: 20px;">
+        <div id="notif-badge" style="cursor: pointer; color: #fff; font-size: 20px; position: relative;">
             <i class="fa-solid fa-bell"></i>
+            <span id="notif-dot" style="display: none; position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: #ef4444; border-radius: 50%;"></span>
         </div>
     </nav>
 
@@ -73,7 +73,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAsUq4BEYktF7gTHMB3zaJNX-ugdPVTfoo",
@@ -109,6 +109,32 @@
                     document.getElementById("taskCount").innerText = data.dailyTasks || 0;
                     document.getElementById("refCount").innerText = data.teamSize || 0;
                     document.getElementById("loader").style.display = "none";
+                }
+            });
+
+            // 🔔 لائیو نوٹیفکیشن مانیٹرنگ سسٹم
+            const notifRef = ref(db, 'notifications/' + phone);
+            onValue(notifRef, (snapshot) => {
+                const notifDot = document.getElementById("notif-dot");
+                const notifBadge = document.getElementById("notif-badge");
+
+                if(snapshot.exists()) {
+                    const notifData = snapshot.val();
+                    notifDot.style.display = "block"; // نیا نوٹیفکیشن آنے پر ریڈ ڈاٹ شو کریں
+
+                    notifBadge.onclick = () => {
+                        alert("🔔 Notification:\n\n" + notifData.text);
+                        
+                        // اوکے کرنے کے بعد فائر بیس ڈیٹا بیس سے ڈیلیٹ کر دیں
+                        remove(notifRef).then(() => {
+                            notifDot.style.display = "none";
+                        });
+                    };
+                } else {
+                    notifDot.style.display = "none";
+                    notifBadge.onclick = () => {
+                        alert("No new notifications.");
+                    };
                 }
             });
         }
